@@ -1,1 +1,742 @@
-<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>CertiChain</title> <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> <style> * { box-sizing: border-box; } body { margin: 0; font-family: Arial, sans-serif; min-height: 100vh; background: radial-gradient(circle at top left, #1769aa, transparent 35%), linear-gradient(135deg, #06152b, #0d2948, #1769aa); color: white; padding: 40px 20px; } .container { max-width: 650px; margin: auto; } header { text-align: center; margin-bottom: 30px; } h1 { font-size: 46px; margin: 0 0 10px; } header p { font-size: 18px; opacity: 0.85; } .card { background: rgba(255,255,255,0.97); color: #172033; padding: 30px; border-radius: 22px; box-shadow: 0 15px 45px rgba(0,0,0,0.25); } h2 { text-align: center; color: #1769aa; margin-top: 0; } .description { text-align: center; color: #667085; margin-bottom: 25px; } input { width: 100%; padding: 15px; border: 1px solid #ccd5e0; border-radius: 10px; font-size: 16px; margin-bottom: 15px; } button { width: 100%; padding: 15px; border: none; border-radius: 10px; background: #1769aa; color: white; font-size: 17px; cursor: pointer; } #result { margin-top: 25px; } .success { background: #ecfdf3; border: 1px solid #86efac; color: #166534; padding: 20px; border-radius: 14px; } .error { background: #fef2f2; border: 1px solid #fca5a5; color: #b91c1c; padding: 18px; border-radius: 14px; } .loading { text-align: center; padding: 15px; color: #1769aa; font-weight: bold; } .hash { word-break: break-all; background: #eef4ff; padding: 12px; border-radius: 8px; font-size: 12px; color: #172033; } footer { text-align: center; margin-top: 25px; opacity: 0.7; font-size: 14px; } </style> </head> <body> <div class="container"> <header> <h1>CertiChain</h1> <p>Digital Certificate Verification</p> </header> <div class="card"> <h2>Verify Your Certificate</h2> <p class="description"> Enter your Certificate ID to verify its authenticity. </p> <input id="certificateID" type="text" placeholder="Enter Certificate ID e.g. CERT-001" > <button onclick="verifyCertificate()"> Verify Certificate </button> <div id="result"></div> </div> <footer> © 2026 CertiChain — Digital Certificate Verification </footer> </div> <script> /* ===================================== SUPABASE ===================================== */ const SUPABASE_URL = "https://czsxktpqlqsfozespzly.supabase.co"; const SUPABASE_PUBLISHABLE_KEY = " sb_publishable_EP_DAGlDLkQHgWUqSNbNhA_6AGcdiYM"; const supabaseClient = window.supabase.createClient( SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY ); /* ===================================== EDGE FUNCTION ===================================== */ const FUNCTION_URL = "https://czsxktpqlqsfozespzly.supabase.co/functions/v1/smart-endpoint"; /* ===================================== VERIFY CERTIFICATE ===================================== */ async function verifyCertificate() { const input = document.getElementById("certificateID"); const result = document.getElementById("result"); /* Get ID from QR/link */ const urlParams = new URLSearchParams( window.location.search ); const urlCertificateID = urlParams.get("id"); /* Use URL ID first, otherwise use input */ const id = (urlCertificateID || input.value) .trim() .toUpperCase(); if (id === "") { result.innerHTML = "<div class='error'>" + "⚠️ Please enter a Certificate ID." + "</div>"; return; } /* Show ID in input when opened by QR */ if (urlCertificateID) { input.value = id; } result.innerHTML = "<div class='loading'>" + "🔍 Verifying certificate..." + "</div>"; /* Get certificate from Supabase */ const { data, error } = await supabaseClient .from("certificates") .select( "certificate_id, student_name, course_name, issue_date, issued_by, status" ) .eq("certificate_id", id) .maybeSingle(); if (error) { console.error(error); result.innerHTML = "<div class='error'>" + "❌ Database connection error." + "</div>"; return; } if (!data) { result.innerHTML = "<div class='error'>" + "❌ Certificate Not Found" + "<br><br>" + "No certificate with ID <b>" + escapeHTML(id) + "</b> was found." + "</div>"; return; } /* Send Certificate ID to Edge Function */ try { const response = await fetch( FUNCTION_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ certificate_id: data.certificate_id }) } ); const blockchainData = await response.json(); if ( !response.ok || !blockchainData.success ) { throw new Error( "Edge Function failed" ); } const certificateHash = blockchainData.hash; /* Show certificate */ result.innerHTML = "<div class='success'>" + "<h3>✅ Certificate Verified</h3>" + "<p><b>Certificate ID:</b> " + escapeHTML( data.certificate_id ) + "</p>" + "<p><b>Student:</b> " + escapeHTML( data.student_name ) + "</p>" + "<p><b>Course:</b> " + escapeHTML( data.course_name ) + "</p>" + "<p><b>Issue Date:</b> " + escapeHTML( data.issue_date ) + "</p>" + "<p><b>Issued By:</b> " + escapeHTML( data.issued_by ) + "</p>" + "<p><b>Status:</b> " + "<span style='color:#15803d;font-weight:bold'>" + escapeHTML( data.status ) + " ✓</span></p>" + "<hr>" + "<p><b>🔐 Certificate Hash</b></p>" + "<div class='hash'>" + escapeHTML( certificateHash ) + "</div>" + "</div>"; } catch (error) { console.error(error); result.innerHTML = "<div class='error'>" + "❌ Blockchain service could not be reached." + "<br><br>" + "Please try again." + "</div>"; } } /* ===================================== SECURITY ===================================== */ function escapeHTML(value) { return String(value ?? "") .replace(/&/g, "&amp;") .replace(/</g, "&lt;") .replace(/>/g, "&gt;") .replace(/"/g, "&quot;") .replace(/'/g, "&#039;"); } /* ===================================== ENTER KEY ===================================== */ document .getElementById("certificateID") .addEventListener( "keydown", function(event) { if (event.key === "Enter") { verifyCertificate(); } } ); /* ===================================== AUTO VERIFY FROM QR CODE ===================================== */ window.addEventListener( "load", function() { const params = new URLSearchParams( window.location.search ); const certificateID = params.get("id"); if (certificateID) { verifyCertificate(); } } ); </script> </body> </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CertiChain</title>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+margin:0;
+font-family:Arial,sans-serif;
+min-height:100vh;
+background:
+radial-gradient(circle at top left,#1769aa,transparent 35%),
+linear-gradient(135deg,#06152b,#0d2948,#1769aa);
+color:white;
+padding:40px 20px;
+}
+
+.container{
+max-width:650px;
+margin:auto;
+}
+
+header{
+text-align:center;
+margin-bottom:30px;
+}
+
+h1{
+font-size:46px;
+margin:0 0 10px;
+}
+
+header p{
+font-size:18px;
+opacity:.85;
+}
+
+.card{
+background:rgba(255,255,255,.97);
+color:#172033;
+padding:30px;
+border-radius:22px;
+box-shadow:0 15px 45px rgba(0,0,0,.25);
+margin-bottom:25px;
+}
+
+h2{
+text-align:center;
+color:#1769aa;
+margin-top:0;
+}
+
+.description{
+text-align:center;
+color:#667085;
+margin-bottom:25px;
+}
+
+input{
+width:100%;
+padding:15px;
+border:1px solid #ccd5e0;
+border-radius:10px;
+font-size:16px;
+margin-bottom:15px;
+}
+
+button{
+width:100%;
+padding:15px;
+border:none;
+border-radius:10px;
+background:#1769aa;
+color:white;
+font-size:17px;
+cursor:pointer;
+}
+
+button:disabled{
+opacity:.6;
+}
+
+.secondary{
+background:#0d2948;
+}
+
+#verifyResult,#issueResult{
+margin-top:25px;
+}
+
+.success{
+background:#ecfdf3;
+border:1px solid #86efac;
+color:#166534;
+padding:20px;
+border-radius:14px;
+}
+
+.error{
+background:#fef2f2;
+border:1px solid #fca5a5;
+color:#b91c1c;
+padding:18px;
+border-radius:14px;
+}
+
+.loading{
+text-align:center;
+padding:15px;
+color:#1769aa;
+font-weight:bold;
+}
+
+.hash{
+word-break:break-all;
+background:#eef4ff;
+padding:12px;
+border-radius:8px;
+font-size:12px;
+color:#172033;
+}
+
+footer{
+text-align:center;
+margin-top:25px;
+opacity:.7;
+font-size:14px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<header>
+<h1>CertiChain</h1>
+<p>Digital Certificate Verification</p>
+</header>
+
+
+<!-- VERIFY CERTIFICATE -->
+
+<div class="card">
+
+<h2>Verify Your Certificate</h2>
+
+<p class="description">
+Enter your Certificate ID to verify its authenticity.
+</p>
+
+<input
+id="certificateID"
+type="text"
+placeholder="Enter Certificate ID e.g. CERT-001"
+>
+
+<button
+id="verifyButton"
+onclick="verifyCertificate()">
+Verify Certificate
+</button>
+
+<div id="verifyResult"></div>
+
+</div>
+
+
+<!-- ISSUE CERTIFICATE -->
+
+<div class="card">
+<div id="adminLogin">
+  <h2>🔐 Admin Login</h2>
+
+  <input
+    type="email"
+    id="adminEmail"
+    placeholder="Admin Email"
+  >
+
+  <input
+    type="password"
+    id="adminPassword"
+    placeholder="Admin Password"
+  >
+
+  <button onclick="adminLoginUser()">
+    Login
+  </button>
+
+  <p id="loginResult"></p>
+</div>
+<h2>Issue New Certificate</h2>
+
+<p class="description">
+Create and save a new digital certificate.
+</p>
+
+<input
+id="issueCertificateID"
+type="text"
+placeholder="Certificate ID e.g. CERT-002"
+>
+
+<input
+id="studentName"
+type="text"
+placeholder="Student Name"
+>
+
+<input
+id="courseName"
+type="text"
+placeholder="Course Name"
+>
+
+<input
+id="issueDate"
+type="date"
+>
+
+<input
+id="issuedBy"
+type="text"
+placeholder="Issued By"
+value="CertiChain"
+>
+
+<button
+id="issueButton"
+class="secondary"
+onclick="issueCertificate()">
+Issue Certificate
+</button>
+
+<div id="issueResult"></div>
+
+</div>
+
+
+<footer>
+© 2026 CertiChain — Digital Certificate Verification
+</footer>
+
+</div>
+
+
+<script>
+
+/* ===============================
+   SUPABASE
+================================ */
+
+const SUPABASE_URL =
+"https://czsxktpqlqsfozespzly.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+"sb_publishable_EP_DAGlDLkQHgWUqSNbNhA_6AGcdiYM";
+
+const supabaseClient =
+window.supabase.createClient(
+SUPABASE_URL,
+SUPABASE_PUBLISHABLE_KEY
+);
+
+
+/* ===============================
+   EDGE FUNCTION
+================================ */
+
+const FUNCTION_URL =
+"https://czsxktpqlqsfozespzly.supabase.co/functions/v1/smart-endpoint";
+
+
+/* ===============================
+   VERIFY CERTIFICATE
+================================ */
+
+async function verifyCertificate(){
+
+const input =
+document.getElementById("certificateID");
+
+const result =
+document.getElementById("verifyResult");
+
+const button =
+document.getElementById("verifyButton");
+
+const id =
+input.value.trim().toUpperCase();
+
+
+if(id === ""){
+
+result.innerHTML =
+"<div class='error'>⚠️ Please enter a Certificate ID.</div>";
+
+return;
+}
+
+
+button.disabled = true;
+
+result.innerHTML =
+"<div class='loading'>🔍 Verifying certificate...</div>";
+
+
+const {data,error} =
+await supabaseClient
+.from("certificates")
+.select(
+"certificate_id, student_name, course_name, issue_date, issued_by, status"
+)
+.eq("certificate_id",id)
+.maybeSingle();
+
+
+if(error){
+
+console.error(error);
+
+result.innerHTML =
+"<div class='error'>❌ Database connection error.</div>";
+
+button.disabled = false;
+
+return;
+}
+
+
+if(!data){
+
+result.innerHTML =
+"<div class='error'>" +
+"❌ Certificate Not Found" +
+"<br><br>" +
+"No certificate with ID <b>" +
+escapeHTML(id) +
+"</b> was found." +
+"</div>";
+
+button.disabled = false;
+
+return;
+}
+
+
+try{
+
+const response =
+await fetch(
+FUNCTION_URL,
+{
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+certificate_id:data.certificate_id
+})
+}
+);
+
+
+const blockchainData =
+await response.json();
+
+
+if(
+!response.ok ||
+!blockchainData.success
+){
+
+throw new Error(
+"Edge Function failed"
+);
+
+}
+
+
+const certificateHash =
+blockchainData.hash;
+
+
+result.innerHTML =
+"<div class='success'>" +
+
+"<h3>✅ Certificate Verified</h3>" +
+
+"<p><b>Certificate ID:</b> " +
+escapeHTML(data.certificate_id) +
+"</p>" +
+
+"<p><b>Student:</b> " +
+escapeHTML(data.student_name) +
+"</p>" +
+
+"<p><b>Course:</b> " +
+escapeHTML(data.course_name) +
+"</p>" +
+
+"<p><b>Issue Date:</b> " +
+escapeHTML(data.issue_date) +
+"</p>" +
+
+"<p><b>Issued By:</b> " +
+escapeHTML(data.issued_by) +
+"</p>" +
+
+"<p><b>Status:</b> " +
+
+"<span style='color:#15803d;font-weight:bold'>" +
+
+escapeHTML(data.status) +
+
+" ✓</span></p>" +
+
+"<hr>" +
+
+"<p><b>🔐 Certificate Hash</b></p>" +
+
+"<div class='hash'>" +
+
+escapeHTML(certificateHash) +
+
+"</div>" +
+
+"</div>";
+
+}
+
+catch(error){
+
+console.error(error);
+
+result.innerHTML =
+"<div class='error'>" +
+
+"❌ Blockchain service could not be reached." +
+
+"<br><br>" +
+
+"Please try again." +
+
+"</div>";
+
+}
+
+
+button.disabled = false;
+
+}
+
+
+/* ===============================
+   ISSUE NEW CERTIFICATE
+================================ */
+
+async function issueCertificate(){
+
+const certificateID =
+document
+.getElementById("issueCertificateID")
+.value
+.trim()
+.toUpperCase();
+
+
+const studentName =
+document
+.getElementById("studentName")
+.value
+.trim();
+
+
+const courseName =
+document
+.getElementById("courseName")
+.value
+.trim();
+
+
+const issueDate =
+document
+.getElementById("issueDate")
+.value;
+
+
+const issuedBy =
+document
+.getElementById("issuedBy")
+.value
+.trim();
+
+
+const result =
+document.getElementById("issueResult");
+
+
+const button =
+document.getElementById("issueButton");
+
+
+if(
+certificateID === "" ||
+studentName === "" ||
+courseName === "" ||
+issueDate === "" ||
+issuedBy === ""
+){
+
+result.innerHTML =
+"<div class='error'>" +
+"⚠️ Please fill in all fields." +
+"</div>";
+
+return;
+}
+
+
+button.disabled = true;
+
+result.innerHTML =
+"<div class='loading'>" +
+"⏳ Saving certificate..." +
+"</div>";
+
+
+const {data,error} =
+await supabaseClient
+.from("certificates")
+.insert([
+{
+certificate_id:certificateID,
+student_name:studentName,
+course_name:courseName,
+issue_date:issueDate,
+issued_by:issuedBy,
+status:"Valid"
+}
+])
+.select();
+
+
+if(error){
+
+console.error(error);
+
+result.innerHTML =
+"<div class='error'>" +
+
+"❌ Could not save certificate." +
+
+"<br><br>" +
+
+escapeHTML(error.message) +
+
+"</div>";
+
+button.disabled = false;
+
+return;
+}
+
+
+result.innerHTML =
+"<div class='success'>" +
+
+"<h3>✅ Certificate Issued!</h3>" +
+
+"<p><b>Certificate ID:</b> " +
+
+escapeHTML(certificateID) +
+
+"</p>" +
+
+"<p><b>Student:</b> " +
+
+escapeHTML(studentName) +
+
+"</p>" +
+
+"<p><b>Course:</b> " +
+
+escapeHTML(courseName) +
+
+"<p><b>Status:</b> Valid ✓</p>" +
+"<p>🔐 The certificate has been saved successfully.</p>" +
+"<p><b>📱 Scan QR Code to verify:</b></p>" +
+"<div id='qrCode' style='margin:15px auto; width:200px;'></div>" +
+"</div>";
+const qrLink = "https://meena2356.github.io/CertiChain-/?id=" + encodeURIComponent(certificateID);
+
+const qrBox = document.getElementById("qrCode");
+
+if (qrBox) {
+    qrBox.innerHTML = "";
+    new QRCode(qrBox, {
+        text: qrLink,
+        width: 200,
+        height: 200
+    });
+  }
+
+
+
+
+button.disabled = false;
+
+}
+
+
+/* ===============================
+   SECURITY
+================================ */
+
+function escapeHTML(value){
+
+return String(value)
+
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
+
+}
+
+
+/* ===============================
+   ENTER KEY
+================================ */
+
+document
+.getElementById("certificateID")
+.addEventListener(
+"keydown",
+function(event){
+
+if(event.key === "Enter"){
+
+verifyCertificate();
+
+}
+
+}
+);
+
+
+/* ===============================
+   QR DIRECT LINK
+================================ */
+
+window.addEventListener(
+"load",
+function(){
+
+const params =
+new URLSearchParams(
+window.location.search
+);
+
+const qrID =
+params.get("id");
+
+
+if(qrID){
+
+const cleanID =
+qrID.trim().toUpperCase();
+
+
+const input =
+document.getElementById(
+"certificateID"
+);
+
+
+input.value = cleanID;
+
+
+/*
+   Wait until the page and
+   Supabase are ready.
+*/
+
+setTimeout(
+function(){
+
+verifyCertificate();
+
+},
+1000
+);
+
+}
+
+}
+);
+async function adminLoginUser(){
+
+  const email =
+    document.getElementById("adminEmail").value.trim();
+
+  const password =
+    document.getElementById("adminPassword").value;
+
+  const result =
+    document.getElementById("loginResult");
+
+  if(!email || !password){
+    result.innerHTML = "⚠️ Please enter email and password.";
+    return;
+  }
+
+  const { data, error } =
+    await supabaseClient.auth.signInWithPassword({
+      email: email,
+      password: password
+    });
+
+  if(error){
+    result.innerHTML = "❌ Login failed.";
+    console.error(error);
+    return;
+  }
+
+  result.innerHTML = "✅ Admin login successful!";
+  }
+</script>
+
+</body>
+  </html>
