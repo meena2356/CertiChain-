@@ -597,6 +597,7 @@ escapeHTML(courseName) +
 "<p>🔐 The certificate has been saved successfully.</p>" +
 "<p><b>📱 Scan QR Code to verify:</b></p>" +
 "<div id='qrCode' style='margin:15px auto; width:200px;'></div>" +
+  "<button onclick='printCertificate()' class='secondary'>🖨️ Print / Save Certificate</button>" +
 "</div>";
 const qrLink = "https://meena2356.github.io/CertiChain-/?id=" + encodeURIComponent(certificateID);
 
@@ -735,6 +736,9 @@ async function adminLoginUser(){
   }
 
   result.innerHTML = "✅ Admin login successful!";
+  }
+  function printCertificate() {
+    window.print();
   }
 </script>
 
