@@ -7,7 +7,119 @@
 
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+/* ===== CertiChain Pricing ===== */
 
+.pricing-section {
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.pricing-section h2 {
+  font-size: 32px;
+  margin-bottom: 10px;
+}
+
+.pricing-subtitle {
+  opacity: 0.8;
+  margin-bottom: 35px;
+}
+
+.pricing-container {
+  max-width: 1100px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 25px;
+}
+
+.pricing-card {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 20px;
+  padding: 30px 22px;
+  text-align: left;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.18);
+  transition: 0.3s;
+  position: relative;
+}
+
+.pricing-card:hover {
+  transform: translateY(-8px);
+}
+
+.pricing-card h3 {
+  text-align: center;
+  font-size: 24px;
+}
+
+.price {
+  text-align: center;
+  font-size: 32px;
+  font-weight: bold;
+  margin: 20px 0;
+}
+
+.price span {
+  font-size: 14px;
+  font-weight: normal;
+  opacity: 0.75;
+}
+
+.pricing-card p {
+  text-align: center;
+  opacity: 0.8;
+}
+
+.pricing-card ul {
+  list-style: none;
+  padding: 0;
+  margin: 25px 0;
+}
+
+.pricing-card li {
+  padding: 8px 0;
+}
+
+.pricing-card button {
+  width: 100%;
+  padding: 13px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.featured {
+  border: 2px solid #ffffff;
+  transform: scale(1.03);
+}
+
+.featured:hover {
+  transform: scale(1.03) translateY(-8px);
+}
+
+.popular {
+  text-align: center;
+  font-size: 13px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* Mobile */
+@media (max-width: 800px) {
+  .pricing-container {
+    grid-template-columns: 1fr;
+  }
+
+  .featured {
+    transform: none;
+  }
+
+  .featured:hover {
+    transform: translateY(-8px);
+  }
+}
 <style>
 *{box-sizing:border-box}
 
@@ -513,7 +625,8 @@ Issue Certificate
 
 </div>
 
-
+  
+}
 <script>
 
 const SUPABASE_URL =
@@ -1033,6 +1146,63 @@ window.print();
 }
 
 </script>
+<!-- CertiChain Pricing -->
+<section class="pricing-section">
+  <h2>💎 CertiChain Plans</h2>
+  <p class="pricing-subtitle">
+    Choose the best plan for your institution
+  </p>
 
+  <div class="pricing-container">
+
+    <div class="pricing-card">
+      <h3>🟢 Basic</h3>
+      <div class="price">300 <span>AFN / month</span></div>
+      <p>Perfect for small training centers.</p>
+      <ul>
+        <li>✅ Digital Certificates</li>
+        <li>✅ QR Code Verification</li>
+        <li>✅ Online Verification</li>
+      </ul>
+      <button onclick="contactCertiChain('Basic')">
+        Start with Basic
+      </button>
+    </div>
+
+    <div class="pricing-card featured">
+      <div class="popular">⭐ MOST POPULAR</div>
+      <h3>🔵 Professional</h3>
+      <div class="price">700 <span>AFN / month</span></div>
+      <p>Our recommended plan for training centers.</p>
+      <ul>
+        <li>✅ Everything in Basic</li>
+        <li>✅ Custom Certificate Design</li>
+        <li>✅ Institution Logo</li>
+        <li>✅ Certificate Management</li>
+        <li>✅ Support</li>
+      </ul>
+      <button onclick="contactCertiChain('Professional')">
+        Start with Professional
+      </button>
+    </div>
+
+    <div class="pricing-card">
+      <h3>🟣 Institution</h3>
+      <div class="price">1500 <span>AFN / month</span></div>
+      <p>For larger educational institutions.</p>
+      <ul>
+        <li>✅ Everything in Professional</li>
+        <li>✅ Multiple Courses</li>
+        <li>✅ Large Certificate Volume</li>
+        <li>✅ Institution Page</li>
+        <li>✅ Priority Support</li>
+      </ul>
+      <button onclick="contactCertiChain('Institution')">
+        Start with Institution
+      </button>
+    </div>
+
+  </div>
+</section>
 </body>
   </html>
