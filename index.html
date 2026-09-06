@@ -1145,6 +1145,34 @@ window.print();
 
 }
 
+
+function contactCertiChain(plan){
+
+const name = prompt("Your Name:");
+if(!name) return;
+
+const email = prompt("Your Email:");
+if(!email) return;
+
+const message =
+"CertiChain Plan Request\n\n" +
+"Plan: " + plan + "\n" +
+"Name: " + name + "\n" +
+"Email: " + email;
+
+alert(
+"✅ Thank you, " + name + "!\n\n" +
+"We received your request for the " + plan +
+" plan.\n\n" +
+"Email: " + email
+);
+
+console.log(message);
+
+  }
+
+
+  
 </script>
 <!-- CertiChain Pricing -->
 <section class="pricing-section">
