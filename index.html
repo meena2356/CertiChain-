@@ -1,13 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>CertiChain — Digital Certificate Verification</title>
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
+
+<title>
+CertiChain — Digital Certificate Verification
+</title>
 
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 
 <style>
 
@@ -16,266 +26,498 @@
 }
 
 body{
+
   margin:0;
+
   font-family:Arial,sans-serif;
+
   min-height:100vh;
+
   background:
-    radial-gradient(circle at 10% 10%,#2388d8,transparent 30%),
-    radial-gradient(circle at 90% 90%,#123f72,transparent 35%),
-    linear-gradient(135deg,#04101f,#0a2340,#1769aa);
+
+    radial-gradient(
+      circle at 10% 10%,
+      #2388d8,
+      transparent 30%
+    ),
+
+    radial-gradient(
+      circle at 90% 90%,
+      #123f72,
+      transparent 35%
+    ),
+
+    linear-gradient(
+      135deg,
+      #04101f,
+      #0a2340,
+      #1769aa
+    );
+
   color:white;
+
   padding:35px 16px;
+
 }
 
+
 .container{
+
   max-width:700px;
+
   margin:auto;
+
 }
+
 
 /* HEADER */
 
 header{
+
   text-align:center;
+
   padding:20px 10px 30px;
+
 }
+
 
 .logo{
+
   width:78px;
+
   height:78px;
+
   margin:0 auto 15px;
+
   border-radius:50%;
+
   display:flex;
+
   align-items:center;
+
   justify-content:center;
+
   font-size:38px;
-  background:rgba(255,255,255,.12);
-  border:2px solid rgba(255,255,255,.35);
-  box-shadow:0 10px 30px rgba(0,0,0,.2);
+
+  background:
+    rgba(255,255,255,.12);
+
+  border:
+    2px solid rgba(255,255,255,.35);
+
+  box-shadow:
+    0 10px 30px rgba(0,0,0,.2);
+
 }
+
 
 header h1{
+
   font-size:44px;
+
   margin:0;
+
   letter-spacing:2px;
+
 }
 
+
 header p{
+
   font-size:17px;
+
   opacity:.82;
+
   margin-top:10px;
+
 }
+
 
 /* CARDS */
 
 .card{
-  background:rgba(255,255,255,.97);
+
+  background:
+    rgba(255,255,255,.97);
+
   color:#172033;
+
   padding:30px;
+
   border-radius:24px;
-  box-shadow:0 20px 55px rgba(0,0,0,.28);
+
+  box-shadow:
+    0 20px 55px rgba(0,0,0,.28);
+
   margin-bottom:25px;
+
 }
+
 
 h2{
+
   text-align:center;
+
   color:#1769aa;
+
   margin-top:0;
+
   font-size:25px;
+
 }
 
+
 .description{
+
   text-align:center;
+
   color:#667085;
+
   margin-bottom:25px;
+
 }
+
 
 /* INPUTS */
 
 input{
+
   width:100%;
+
   padding:15px 16px;
-  border:1px solid #d0d7e2;
+
+  border:
+    1px solid #d0d7e2;
+
   border-radius:12px;
+
   font-size:16px;
+
   margin-bottom:15px;
+
   outline:none;
+
   transition:.2s;
+
 }
 
+
 input:focus{
+
   border-color:#1769aa;
-  box-shadow:0 0 0 3px rgba(23,105,170,.12);
+
+  box-shadow:
+    0 0 0 3px rgba(23,105,170,.12);
+
 }
+
 
 /* BUTTONS */
 
 button{
+
   width:100%;
+
   padding:15px;
+
   border:none;
+
   border-radius:12px;
-  background:linear-gradient(135deg,#1769aa,#0d4f86);
+
+  background:
+    linear-gradient(
+      135deg,
+      #1769aa,
+      #0d4f86
+    );
+
   color:white;
+
   font-size:17px;
+
   font-weight:bold;
+
   cursor:pointer;
-  box-shadow:0 8px 18px rgba(13,79,134,.22);
+
+  box-shadow:
+    0 8px 18px rgba(13,79,134,.22);
+
   transition:.2s;
+
 }
+
 
 button:hover{
-  transform:translateY(-1px);
+
+  transform:
+    translateY(-1px);
+
 }
+
 
 button:disabled{
+
   opacity:.6;
+
   cursor:not-allowed;
+
   transform:none;
+
 }
 
+
 .secondary{
-  background:linear-gradient(135deg,#0d2948,#123f72);
+
+  background:
+    linear-gradient(
+      135deg,
+      #0d2948,
+      #123f72
+    );
+
 }
+
+
+.revoke-button{
+
+  background:
+    linear-gradient(
+      135deg,
+      #b91c1c,
+      #7f1d1d
+    );
+
+  margin-top:10px;
+
+}
+
 
 /* RESULTS */
 
 #verifyResult,
 #issueResult{
+
   margin-top:25px;
+
 }
+
 
 .success{
+
   background:#ecfdf3;
-  border:1px solid #86efac;
+
+  border:
+    1px solid #86efac;
+
   color:#166534;
+
   padding:20px;
+
   border-radius:16px;
+
 }
+
 
 .error{
+
   background:#fef2f2;
-  border:1px solid #fca5a5;
+
+  border:
+    1px solid #fca5a5;
+
   color:#b91c1c;
+
   padding:18px;
+
   border-radius:16px;
+
 }
+
 
 .loading{
+
   text-align:center;
+
   padding:15px;
+
   color:#1769aa;
+
   font-weight:bold;
+
 }
+
 
 .hash{
+
   word-break:break-all;
+
   background:#eef4ff;
+
   padding:12px;
+
   border-radius:9px;
+
   font-size:12px;
+
   color:#172033;
+
 }
 
-/* =====================================
+
+/* =====================================================
    PREMIUM CERTIFICATE
-===================================== */
+===================================================== */
 
 .certificate{
+
   margin-top:30px;
+
   padding:14px;
-  background:linear-gradient(
-    135deg,
-    #b88918,
-    #f7e7a9,
-    #d4af37,
-    #fff2b8,
-    #b88918
-  );
+
+  background:
+
+    linear-gradient(
+      135deg,
+      #b88918,
+      #f7e7a9,
+      #d4af37,
+      #fff2b8,
+      #b88918
+    );
+
   border-radius:18px;
-  box-shadow:0 25px 60px rgba(0,0,0,.30);
+
+  box-shadow:
+    0 25px 60px rgba(0,0,0,.30);
+
 }
 
+
 .certificate-border{
+
   position:relative;
+
   overflow:hidden;
 
-  border:3px solid #b88918;
-  outline:1px solid #d4af37;
+  border:
+    3px solid #b88918;
+
+  outline:
+    1px solid #d4af37;
+
   outline-offset:-9px;
 
   border-radius:12px;
 
-  padding:55px 45px 45px;
+  padding:55px 45px 40px;
 
   text-align:center;
 
   background:
+
     radial-gradient(
       circle at 15% 15%,
       rgba(212,175,55,.10),
       transparent 25%
     ),
+
     radial-gradient(
       circle at 85% 85%,
       rgba(212,175,55,.10),
       transparent 25%
     ),
+
     #ffffff;
 
-  min-height:650px;
+  min-height:700px;
+
 }
 
-/* Decorative corners */
 
 .certificate-border:before,
 .certificate-border:after{
+
   content:"";
+
   position:absolute;
+
   width:110px;
+
   height:110px;
-  border:3px solid #d4af37;
+
+  border:
+    3px solid #d4af37;
+
   opacity:.45;
+
+  pointer-events:none;
+
 }
+
 
 .certificate-border:before{
+
   top:18px;
+
   left:18px;
+
   border-right:0;
+
   border-bottom:0;
+
 }
+
 
 .certificate-border:after{
+
   bottom:18px;
+
   right:18px;
+
   border-left:0;
+
   border-top:0;
+
 }
+
 
 .certificate-border > *{
+
   position:relative;
+
   z-index:2;
+
 }
 
-/* Certificate logo */
+
+/* LOGO */
 
 .certificate-top{
+
   width:72px;
+
   height:72px;
+
   margin:0 auto 15px;
 
   display:flex;
+
   align-items:center;
+
   justify-content:center;
 
   border-radius:50%;
 
-  background:linear-gradient(
-    135deg,
-    #172b4d,
-    #0b172a
-  );
+  background:
 
-  border:3px solid #d4af37;
+    linear-gradient(
+      135deg,
+      #172b4d,
+      #0b172a
+    );
+
+  border:
+    3px solid #d4af37;
 
   color:white;
 
@@ -283,11 +525,14 @@ button:disabled{
 
   box-shadow:
     0 8px 20px rgba(0,0,0,.18);
+
 }
 
-/* Main title */
+
+/* TITLE */
 
 .certificate h1{
+
   margin:5px 0 4px;
 
   font-family:Georgia,serif;
@@ -297,11 +542,12 @@ button:disabled{
   letter-spacing:7px;
 
   color:#172b4d;
+
 }
 
-/* Subtitle */
 
 .certificate h2{
+
   margin:8px 0 30px;
 
   font-family:Georgia,serif;
@@ -311,11 +557,14 @@ button:disabled{
   letter-spacing:6px;
 
   color:#b88918;
+
 }
 
-/* Intro */
+
+/* INTRO */
 
 .cert-intro{
+
   color:#667085;
 
   font-family:Georgia,serif;
@@ -323,11 +572,14 @@ button:disabled{
   font-size:15px;
 
   margin:14px 0;
+
 }
 
-/* Student */
+
+/* STUDENT */
 
 .student-name{
+
   margin:18px 0 8px;
 
   font-family:Georgia,serif;
@@ -339,11 +591,14 @@ button:disabled{
   color:#172b4d;
 
   letter-spacing:1px;
+
 }
 
-/* Gold line */
+
+/* LINE */
 
 .line{
+
   width:55%;
 
   height:2px;
@@ -351,17 +606,21 @@ button:disabled{
   margin:0 auto 22px;
 
   background:
+
     linear-gradient(
       90deg,
       transparent,
       #d4af37,
       transparent
     );
+
 }
 
-/* Course */
+
+/* COURSE */
 
 .course-name{
+
   margin:16px 0 28px;
 
   font-family:Georgia,serif;
@@ -371,11 +630,14 @@ button:disabled{
   font-weight:bold;
 
   color:#b88918;
+
 }
 
-/* Information */
+
+/* INFORMATION */
 
 .cert-info{
+
   display:grid;
 
   grid-template-columns:
@@ -391,30 +653,40 @@ button:disabled{
 
   border-radius:10px;
 
-  margin:25px 0 18px;
+  margin:25px 0 15px;
 
-  border:1px solid #ead9a2;
+  border:
+    1px solid #ead9a2;
+
 }
 
+
 .cert-info p{
+
   margin:5px 0;
 
   font-size:12px;
 
   color:#475467;
+
 }
 
+
 .cert-info b{
+
   display:block;
 
   color:#172b4d;
 
   margin-bottom:5px;
+
 }
 
-/* Status */
+
+/* STATUS */
 
 .cert-status{
+
   display:inline-block;
 
   padding:8px 18px;
@@ -423,7 +695,8 @@ button:disabled{
 
   background:#f8f7e9;
 
-  border:1px solid #d4af37;
+  border:
+    1px solid #d4af37;
 
   color:#8a6812;
 
@@ -433,12 +706,28 @@ button:disabled{
 
   letter-spacing:1px;
 
-  margin:8px 0 14px;
+  margin:8px 0 12px;
+
 }
+
+
+/* REVOKED STATUS */
+
+.cert-status.revoked{
+
+  background:#fef2f2;
+
+  border-color:#fca5a5;
+
+  color:#b91c1c;
+
+}
+
 
 /* QR */
 
 .qr-title{
+
   color:#172b4d;
 
   font-size:13px;
@@ -448,14 +737,17 @@ button:disabled{
   letter-spacing:.5px;
 
   margin-bottom:8px;
+
 }
 
+
 .qr-box{
+
   width:155px;
 
   min-height:155px;
 
-  margin:8px auto 18px;
+  margin:8px auto 14px;
 
   padding:7px;
 
@@ -467,17 +759,21 @@ button:disabled{
 
   background:white;
 
-  border:2px solid #d4af37;
+  border:
+    2px solid #d4af37;
 
   border-radius:10px;
 
   box-shadow:
     0 6px 15px rgba(0,0,0,.08);
+
 }
 
-/* Verification */
+
+/* VERIFICATION TEXT */
 
 .certificate-verified{
+
   font-size:11px;
 
   font-weight:bold;
@@ -486,24 +782,173 @@ button:disabled{
 
   color:#172b4d;
 
-  margin-top:4px;
+  margin-top:3px;
+
 }
 
-/* Certificate button */
+
+/* =====================================================
+   SIGNATURE + SEAL
+===================================================== */
+
+.signature-seal-area{
+
+  display:flex;
+
+  align-items:flex-end;
+
+  justify-content:center;
+
+  gap:70px;
+
+  margin-top:25px;
+
+}
+
+
+.signature-box{
+
+  width:180px;
+
+  text-align:center;
+
+}
+
+
+.signature-line{
+
+  width:100%;
+
+  height:1px;
+
+  background:#b88918;
+
+  margin-bottom:7px;
+
+}
+
+
+.signature-title{
+
+  font-family:Georgia,serif;
+
+  font-size:11px;
+
+  color:#667085;
+
+  letter-spacing:.8px;
+
+}
+
+
+.signature-name{
+
+  font-size:12px;
+
+  font-weight:bold;
+
+  color:#172b4d;
+
+  margin-top:4px;
+
+}
+
+
+/* SEAL */
+
+.certichain-seal{
+
+  width:72px;
+
+  height:72px;
+
+  border-radius:50%;
+
+  border:
+    3px solid #d4af37;
+
+  background:#172b4d;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  box-shadow:
+    0 5px 15px rgba(0,0,0,.15);
+
+}
+
+
+.seal-inner{
+
+  width:56px;
+
+  height:56px;
+
+  border:
+    1px solid #d4af37;
+
+  border-radius:50%;
+
+  display:flex;
+
+  flex-direction:column;
+
+  align-items:center;
+
+  justify-content:center;
+
+  color:#f5d878;
+
+}
+
+
+.seal-inner strong{
+
+  font-family:Georgia,serif;
+
+  font-size:20px;
+
+  letter-spacing:2px;
+
+}
+
+
+.seal-inner span{
+
+  font-size:7px;
+
+  letter-spacing:1px;
+
+  margin-top:2px;
+
+}
+
+
+/* CERTIFICATE BUTTON */
 
 .certificate button{
+
   max-width:300px;
 
-  margin:10px auto 0;
+  margin:12px auto 0;
+
 }
+
 
 /* ADMIN */
 
 #issueSection{
+
   display:none;
+
 }
 
+
 .login-success{
+
   text-align:center;
 
   background:#ecfdf3;
@@ -517,11 +962,14 @@ button:disabled{
   margin-top:15px;
 
   font-weight:bold;
+
 }
+
 
 /* PRICING */
 
 .pricing-section{
+
   padding:60px 20px;
 
   text-align:center;
@@ -529,23 +977,32 @@ button:disabled{
   max-width:1100px;
 
   margin:auto;
+
 }
 
+
 .pricing-section h2{
+
   font-size:32px;
 
   margin-bottom:10px;
 
   color:white;
+
 }
 
+
 .pricing-subtitle{
+
   opacity:.8;
 
   margin-bottom:35px;
+
 }
 
+
 .pricing-container{
+
   max-width:1100px;
 
   margin:auto;
@@ -556,9 +1013,12 @@ button:disabled{
     repeat(3,1fr);
 
   gap:25px;
+
 }
 
+
 .pricing-card{
+
   background:
     rgba(255,255,255,.08);
 
@@ -577,19 +1037,29 @@ button:disabled{
   transition:.3s;
 
   position:relative;
+
 }
+
 
 .pricing-card:hover{
-  transform:translateY(-8px);
+
+  transform:
+    translateY(-8px);
+
 }
 
+
 .pricing-card h3{
+
   text-align:center;
 
   font-size:24px;
+
 }
 
+
 .price{
+
   text-align:center;
 
   font-size:32px;
@@ -597,35 +1067,50 @@ button:disabled{
   font-weight:bold;
 
   margin:20px 0;
+
 }
 
+
 .price span{
+
   font-size:14px;
 
   font-weight:normal;
 
   opacity:.75;
+
 }
 
+
 .pricing-card p{
+
   text-align:center;
 
   opacity:.8;
+
 }
 
+
 .pricing-card ul{
+
   list-style:none;
 
   padding:0;
 
   margin:25px 0;
+
 }
+
 
 .pricing-card li{
+
   padding:8px 0;
+
 }
 
+
 .pricing-card button{
+
   width:100%;
 
   padding:13px;
@@ -639,19 +1124,31 @@ button:disabled{
   font-size:16px;
 
   font-weight:bold;
+
 }
+
 
 .featured{
-  border:2px solid white;
 
-  transform:scale(1.03);
+  border:
+    2px solid white;
+
+  transform:
+    scale(1.03);
+
 }
+
 
 .featured:hover{
-  transform:scale(1.03) translateY(-8px);
+
+  transform:
+    scale(1.03) translateY(-8px);
+
 }
 
+
 .popular{
+
   text-align:center;
 
   font-size:13px;
@@ -659,11 +1156,14 @@ button:disabled{
   font-weight:bold;
 
   margin-bottom:10px;
+
 }
+
 
 /* FOOTER */
 
 footer{
+
   text-align:center;
 
   margin-top:30px;
@@ -673,94 +1173,168 @@ footer{
   opacity:.72;
 
   font-size:14px;
+
 }
+
 
 /* MOBILE */
 
 @media(max-width:800px){
 
   .pricing-container{
+
     grid-template-columns:1fr;
+
   }
 
   .featured{
+
     transform:none;
+
   }
 
   .featured:hover{
-    transform:translateY(-8px);
+
+    transform:
+      translateY(-8px);
+
   }
 
 }
+
 
 @media(max-width:600px){
 
   body{
+
     padding:20px 12px;
+
   }
 
   header h1{
+
     font-size:38px;
+
   }
 
   .card{
+
     padding:22px;
+
   }
 
   .certificate{
+
     padding:8px;
+
   }
 
   .certificate-border{
+
     padding:40px 18px 30px;
 
     min-height:auto;
+
   }
 
   .certificate h1{
+
     font-size:29px;
 
     letter-spacing:4px;
+
   }
 
   .certificate h2{
+
     font-size:13px;
 
     letter-spacing:4px;
+
   }
 
   .student-name{
+
     font-size:27px;
+
   }
 
   .course-name{
+
     font-size:20px;
+
   }
 
   .cert-info{
+
     grid-template-columns:1fr;
 
     gap:5px;
+
   }
 
   .qr-box{
+
     width:145px;
 
     min-height:145px;
+
+  }
+
+  .signature-seal-area{
+
+    gap:25px;
+
+    margin-top:20px;
+
+  }
+
+  .signature-box{
+
+    width:135px;
+
+  }
+
+  .certichain-seal{
+
+    width:62px;
+
+    height:62px;
+
+  }
+
+  .seal-inner{
+
+    width:48px;
+
+    height:48px;
+
   }
 
 }
 
+
 /* PRINT */
+
+@page{
+
+  size:A4 landscape;
+
+  margin:0;
+
+}
+
 
 @media print{
 
   body{
+
     background:white;
 
     color:#172033;
 
     padding:0;
+
   }
 
   header,
@@ -768,65 +1342,87 @@ footer{
   .pricing-section,
   #verifySection,
   footer{
+
     display:none !important;
+
   }
 
   .container{
+
     max-width:none;
 
     width:100%;
+
   }
 
   .card{
+
     box-shadow:none;
 
     margin:0;
 
     padding:0;
+
   }
 
   #issueResult{
+
     margin:0;
+
   }
 
   .certificate{
+
     margin:0;
 
-    padding:10px;
+    padding:10mm;
 
     box-shadow:none;
 
     width:100%;
+
   }
 
   .certificate-border{
-    min-height:90vh;
+
+    min-height:180mm;
 
     display:flex;
 
     flex-direction:column;
 
     justify-content:center;
+
   }
 
   .certificate button{
+
     display:none !important;
+
   }
 
 }
 
 </style>
+
 </head>
+
 
 <body>
 
+
 <div class="container">
+
 
 <header>
 
-  <div class="logo">🏆</div>
+  <div class="logo">
+    🏆
+  </div>
 
-  <h1>CertiChain</h1>
+  <h1>
+    CertiChain
+  </h1>
 
   <p>
     Secure Digital Certificate Verification
@@ -835,9 +1431,15 @@ footer{
 </header>
 
 
-<!-- VERIFY -->
 
-<div class="card" id="verifySection">
+<!-- =====================================================
+     VERIFY
+===================================================== -->
+
+<div
+  class="card"
+  id="verifySection"
+>
 
   <h2>
     Verify Your Certificate
@@ -865,9 +1467,13 @@ footer{
 </div>
 
 
-<!-- ADMIN -->
+
+<!-- =====================================================
+     ADMIN
+===================================================== -->
 
 <div class="card">
+
 
   <div id="adminLogin">
 
@@ -897,6 +1503,7 @@ footer{
     <p id="loginResult"></p>
 
   </div>
+
 
 
   <!-- ISSUE CERTIFICATE -->
@@ -955,16 +1562,22 @@ footer{
 
 </div>
 
+
+
 <footer>
 
   © 2026 CertiChain — Secure Digital Certificates
 
 </footer>
 
+
 </div>
 
 
-<!-- PRICING -->
+
+<!-- =====================================================
+     PRICING
+===================================================== -->
 
 <section class="pricing-section">
 
@@ -976,7 +1589,9 @@ footer{
     Choose the best plan for your institution
   </p>
 
+
   <div class="pricing-container">
+
 
     <div class="pricing-card">
 
@@ -985,8 +1600,13 @@ footer{
       </h3>
 
       <div class="price">
+
         300
-        <span>AFN / month</span>
+
+        <span>
+          AFN / month
+        </span>
+
       </div>
 
       <p>
@@ -995,11 +1615,17 @@ footer{
 
       <ul>
 
-        <li>✅ Digital Certificates</li>
+        <li>
+          ✅ Digital Certificates
+        </li>
 
-        <li>✅ QR Code Verification</li>
+        <li>
+          ✅ QR Code Verification
+        </li>
 
-        <li>✅ Online Verification</li>
+        <li>
+          ✅ Online Verification
+        </li>
 
       </ul>
 
@@ -1010,6 +1636,7 @@ footer{
       </button>
 
     </div>
+
 
 
     <div class="pricing-card featured">
@@ -1023,8 +1650,13 @@ footer{
       </h3>
 
       <div class="price">
+
         700
-        <span>AFN / month</span>
+
+        <span>
+          AFN / month
+        </span>
+
       </div>
 
       <p>
@@ -1033,15 +1665,25 @@ footer{
 
       <ul>
 
-        <li>✅ Everything in Basic</li>
+        <li>
+          ✅ Everything in Basic
+        </li>
 
-        <li>✅ Custom Certificate Design</li>
+        <li>
+          ✅ Custom Certificate Design
+        </li>
 
-        <li>✅ Institution Logo</li>
+        <li>
+          ✅ Institution Logo
+        </li>
 
-        <li>✅ Certificate Management</li>
+        <li>
+          ✅ Certificate Management
+        </li>
 
-        <li>✅ Support</li>
+        <li>
+          ✅ Support
+        </li>
 
       </ul>
 
@@ -1054,6 +1696,7 @@ footer{
     </div>
 
 
+
     <div class="pricing-card">
 
       <h3>
@@ -1061,8 +1704,13 @@ footer{
       </h3>
 
       <div class="price">
+
         1500
-        <span>AFN / month</span>
+
+        <span>
+          AFN / month
+        </span>
+
       </div>
 
       <p>
@@ -1071,15 +1719,25 @@ footer{
 
       <ul>
 
-        <li>✅ Everything in Professional</li>
+        <li>
+          ✅ Everything in Professional
+        </li>
 
-        <li>✅ Multiple Courses</li>
+        <li>
+          ✅ Multiple Courses
+        </li>
 
-        <li>✅ Large Certificate Volume</li>
+        <li>
+          ✅ Large Certificate Volume
+        </li>
 
-        <li>✅ Institution Page</li>
+        <li>
+          ✅ Institution Page
+        </li>
 
-        <li>✅ Priority Support</li>
+        <li>
+          ✅ Priority Support
+        </li>
 
       </ul>
 
@@ -1091,12 +1749,15 @@ footer{
 
     </div>
 
+
   </div>
 
 </section>
 
 
+
 <script>
+
 
 /* =====================================================
    SUPABASE
@@ -1105,14 +1766,17 @@ footer{
 const SUPABASE_URL =
 "https://czsxktpqlqsfozespzly.supabase.co";
 
+
 const SUPABASE_PUBLISHABLE_KEY =
-"sb_publishable_EP_DAGlDLkQHgWUqSNbNhA_6AGcdiYM";
+"sb_publishable_EP_DAGlDLKQHgWUqSNbNhA_6AGcdiYM";
+
 
 const supabaseClient =
 window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_PUBLISHABLE_KEY
 );
+
 
 
 /* =====================================================
@@ -1122,220 +1786,597 @@ window.supabase.createClient(
 async function verifyCertificate(){
 
   const input =
-    document.getElementById("certificateID");
+    document.getElementById(
+      "certificateID"
+    );
 
   const result =
-    document.getElementById("verifyResult");
+    document.getElementById(
+      "verifyResult"
+    );
 
   const button =
-    document.getElementById("verifyButton");
+    document.getElementById(
+      "verifyButton"
+    );
+
 
   const certificateId =
-    input.value.trim().toUpperCase();
+    input.value
+      .trim()
+      .toUpperCase();
+
 
   if(!certificateId){
 
     result.innerHTML =
+
       "<div class='error'>" +
+
       "⚠️ Please enter a Certificate ID." +
+
       "</div>";
 
     return;
+
   }
+
 
   button.disabled = true;
 
   button.innerText =
     "Verifying...";
 
+
   result.innerHTML =
+
     "<div class='loading'>" +
+
     "⏳ Checking certificate..." +
+
     "</div>";
+
 
   try{
 
+
+    /* ===============================================
+       CALL EDGE FUNCTION
+    =============================================== */
+
     const { data, error } =
+
       await supabaseClient.functions.invoke(
+
         "Verify_Certificate-",
+
         {
+
           body:{
-            certificateId:certificateId
+            certificateId:
+              certificateId
           }
+
         }
+
       );
 
+
     if(error){
+
       throw error;
+
     }
+
 
     console.log(
       "Verify response:",
       data
     );
 
-    if(!data || !data.success){
+
+    if(
+      !data ||
+      !data.success
+    ){
 
       result.innerHTML =
+
         "<div class='error'>" +
 
         "<strong>" +
+
         "❌ Certificate Not Verified" +
+
         "</strong>" +
 
         "<br><br>" +
 
         escapeHTML(
+
           data?.message ||
+
           "Certificate not found or invalid."
+
         ) +
 
         "</div>";
 
       return;
+
     }
 
+
     const certificate =
+
       data.certificate ||
+
       data.data ||
+
       data;
 
+
     const verifiedID =
+
       certificate.certificateId ||
+
       certificate.certificate_id ||
+
       data.certificateId ||
+
       data.certificate_id ||
+
       certificateId;
 
+
     const student =
+
       certificate.studentName ||
+
       certificate.student_name ||
+
       data.studentName ||
+
       data.student_name ||
+
       "Not available";
+
 
     const course =
+
       certificate.courseName ||
+
       certificate.course_name ||
+
       data.courseName ||
+
       data.course_name ||
+
       "Not available";
+
 
     const issueDate =
+
       certificate.issueDate ||
+
       certificate.issue_date ||
+
       data.issueDate ||
+
       data.issue_date ||
+
       "Not available";
+
 
     const issuedBy =
+
       certificate.issuedBy ||
+
       certificate.issued_by ||
+
       data.issuedBy ||
+
       data.issued_by ||
+
       "Not available";
+
 
     const hash =
+
       certificate.hash ||
+
       certificate.certificateHash ||
+
       certificate.certificate_hash ||
+
       data.hash ||
+
       data.certificateHash ||
+
       data.certificate_hash ||
+
       "Not available";
 
+
+    /* ===============================================
+       GET REAL STATUS FROM RESPONSE
+    =============================================== */
+
+    let status =
+
+      certificate.status ||
+
+      data.status ||
+
+      null;
+
+
+    /* ===============================================
+       IF EDGE FUNCTION DOES NOT RETURN STATUS,
+       READ STATUS FROM SUPABASE TABLE
+    =============================================== */
+
+    if(!status){
+
+      const {
+        data:statusData,
+        error:statusError
+      } =
+
+        await supabaseClient
+
+          .from("certificates")
+
+          .select("status")
+
+          .eq(
+            "certificate_id",
+            verifiedID
+          )
+
+          .maybeSingle();
+
+
+      if(!statusError && statusData){
+
+        status =
+          statusData.status;
+
+      }
+
+    }
+
+
+    status =
+      String(
+        status || "Valid"
+      );
+
+
+    const isRevoked =
+      status.toLowerCase() ===
+      "revoked";
+
+
     const qrLink =
+
       "https://meena2356.github.io/CertiChain-/" +
+
       "?id=" +
-      encodeURIComponent(verifiedID);
 
-    result.innerHTML =
+      encodeURIComponent(
+        verifiedID
+      );
 
-      "<div class='success'>" +
 
-      "<div style='text-align:center;margin-bottom:20px;'>" +
+    /* ===============================================
+       REVOKED
+    =============================================== */
 
-      "<div style='font-size:48px;'>✅</div>" +
+    if(isRevoked){
 
-      "<h2 style='color:#166534;margin:5px 0;'>" +
-      "Certificate Verified" +
-      "</h2>" +
+      result.innerHTML =
 
-      "<p style='color:#166534;margin:0;'>" +
-      "This certificate is valid and authentic." +
-      "</p>" +
+        "<div class='error'>" +
 
-      "</div>" +
+        "<div style='text-align:center;margin-bottom:20px;'>" +
 
-      "<div class='cert-info'>" +
+        "<div style='font-size:48px;'>⚠️</div>" +
 
-      "<p><b>🆔 Certificate ID:</b><br>" +
-      escapeHTML(verifiedID) +
-      "</p>" +
+        "<h2 style='color:#b91c1c;margin:5px 0;'>" +
 
-      "<p><b>👤 Student Name:</b><br>" +
-      escapeHTML(student) +
-      "</p>" +
+        "Certificate Revoked" +
 
-      "<p><b>📚 Course:</b><br>" +
-      escapeHTML(course) +
-      "</p>" +
+        "</h2>" +
 
-      "<p><b>📅 Issue Date:</b><br>" +
-      escapeHTML(issueDate) +
-      "</p>" +
+        "<p style='color:#b91c1c;margin:0;'>" +
 
-      "<p><b>🏫 Issued By:</b><br>" +
-      escapeHTML(issuedBy) +
-      "</p>" +
+        "This certificate has been revoked by the issuer." +
 
-      "<p><b>🔐 Certificate Hash:</b></p>" +
+        "</p>" +
 
-      "<div class='hash'>" +
-      escapeHTML(hash) +
-      "</div>" +
+        "</div>" +
 
-      "</div>" +
 
-      "<div style='text-align:center;margin-top:25px;'>" +
+        "<div class='cert-info'>" +
 
-      "<div class='cert-status'>" +
-      "VALID ✓" +
-      "</div>" +
+        "<p>" +
 
-      "<p class='qr-title'>" +
-      "📱 Scan to Verify Certificate" +
-      "</p>" +
+        "<b>🆔 Certificate ID:</b><br>" +
 
-      "<div id='verifyQRCode' class='qr-box'></div>" +
+        escapeHTML(
+          verifiedID
+        ) +
 
-      "</div>" +
+        "</p>" +
 
-      "</div>";
+
+        "<p>" +
+
+        "<b>👤 Student Name:</b><br>" +
+
+        escapeHTML(
+          student
+        ) +
+
+        "</p>" +
+
+
+        "<p>" +
+
+        "<b>📚 Course:</b><br>" +
+
+        escapeHTML(
+          course
+        ) +
+
+        "</p>" +
+
+
+        "<p>" +
+
+        "<b>📅 Issue Date:</b><br>" +
+
+        escapeHTML(
+          issueDate
+        ) +
+
+        "</p>" +
+
+
+        "<p>" +
+
+        "<b>🏫 Issued By:</b><br>" +
+
+        escapeHTML(
+          issuedBy
+        ) +
+
+        "</p>" +
+
+
+        "<p>" +
+
+        "<b>🔐 Certificate Hash:</b>" +
+
+        "</p>" +
+
+
+        "<div class='hash'>" +
+
+        escapeHTML(
+          hash
+        ) +
+
+        "</div>" +
+
+
+        "</div>" +
+
+
+        "<div style='text-align:center;margin-top:25px;'>" +
+
+        "<div class='cert-status revoked'>" +
+
+        "⚠️ REVOKED" +
+
+        "</div>" +
+
+
+        "<p class='qr-title'>" +
+
+        "📱 Scan to Check Certificate Status" +
+
+        "</p>" +
+
+
+        "<div id='verifyQRCode' class='qr-box'></div>" +
+
+
+        "</div>" +
+
+
+        "</div>";
+
+
+    }
+
+
+    /* ===============================================
+       VALID
+    =============================================== */
+
+    else{
+
+      result.innerHTML =
+
+        "<div class='success'>" +
+
+        "<div style='text-align:center;margin-bottom:20px;'>" +
+
+        "<div style='font-size:48px;'>✅</div>" +
+
+        "<h2 style='color:#166534;margin:5px 0;'>" +
+
+        "Certificate Verified" +
+
+        "</h2>" +
+
+        "<p style='color:#166534;margin:0;'>" +
+
+        "This certificate is valid and authentic." +
+
+        "</p>" +
+
+        "</div>" +
+
+
+        "<div class='cert-info'>" +
+
+        "<p>" +
+
+        "<b>🆔 Certificate ID:</b><br>" +
+
+        escapeHTML(
+          verifiedID
+        ) +
+
+        "</p>" +
+
+
+        "<p>" +
+
+        "<b>👤 Student Name:</b><br>" +
+
+        escapeHTML(
+          student
+        ) +
+
+        "</p>" +
+
+
+        "<p>" +
+
+        "<b>📚 Course:</b><br>" +
+
+        escapeHTML(
+          course
+        ) +
+
+        "</p>" +
+
+
+        "<p>" +
+
+        "<b>📅 Issue Date:</b><br>" +
+
+        escapeHTML(
+          issueDate
+        ) +
+
+        "</p>" +
+
+
+        "<p>" +
+
+        "<b>🏫 Issued By:</b><br>" +
+
+        escapeHTML(
+          issuedBy
+        ) +
+
+        "</p>" +
+
+
+        "<p>" +
+
+        "<b>🔐 Certificate Hash:</b>" +
+
+        "</p>" +
+
+
+        "<div class='hash'>" +
+
+        escapeHTML(
+          hash
+        ) +
+
+        "</div>" +
+
+
+        "</div>" +
+
+
+        "<div style='text-align:center;margin-top:25px;'>" +
+
+        "<div class='cert-status'>" +
+
+        "VALID ✓" +
+
+        "</div>" +
+
+
+        "<p class='qr-title'>" +
+
+        "📱 Scan to Verify Certificate" +
+
+        "</p>" +
+
+
+        "<div id='verifyQRCode' class='qr-box'></div>" +
+
+
+        "</div>" +
+
+
+        "</div>";
+
+    }
+
+
+    /* ===============================================
+       CREATE QR
+    =============================================== */
 
     const qrBox =
+
       document.getElementById(
         "verifyQRCode"
       );
+
 
     if(qrBox){
 
       qrBox.innerHTML = "";
 
+
       new QRCode(
+
         qrBox,
+
         {
-          text:qrLink,
-          width:200,
-          height:200,
+
+          text:
+            qrLink,
+
+          width:
+            200,
+
+          height:
+            200,
+
           correctLevel:
             QRCode.CorrectLevel.H
+
         }
+
       );
 
     }
 
+
   }
+
 
   catch(error){
 
@@ -1344,23 +2385,31 @@ async function verifyCertificate(){
       error
     );
 
+
     result.innerHTML =
+
       "<div class='error'>" +
 
       "<strong>" +
+
       "❌ Verification Error" +
+
       "</strong>" +
 
       "<br><br>" +
 
       escapeHTML(
+
         error.message ||
+
         "Unable to verify certificate."
+
       ) +
 
       "</div>";
 
   }
+
 
   finally{
 
@@ -1374,13 +2423,16 @@ async function verifyCertificate(){
 }
 
 
+
 /* =====================================================
    ISSUE CERTIFICATE
 ===================================================== */
 
 async function issueCertificate(){
 
+
   const certificateID =
+
     document
       .getElementById(
         "issueCertificateID"
@@ -1389,7 +2441,9 @@ async function issueCertificate(){
       .trim()
       .toUpperCase();
 
+
   const studentName =
+
     document
       .getElementById(
         "studentName"
@@ -1397,7 +2451,9 @@ async function issueCertificate(){
       .value
       .trim();
 
+
   const courseName =
+
     document
       .getElementById(
         "courseName"
@@ -1405,12 +2461,18 @@ async function issueCertificate(){
       .value
       .trim();
 
+
   const issueDate =
-    document.getElementById(
-      "issueDate"
-    ).value;
+
+    document
+      .getElementById(
+        "issueDate"
+      )
+      .value;
+
 
   const issuedBy =
+
     document
       .getElementById(
         "issuedBy"
@@ -1418,46 +2480,76 @@ async function issueCertificate(){
       .value
       .trim();
 
+
   const result =
+
     document.getElementById(
       "issueResult"
     );
 
+
   const button =
+
     document.getElementById(
       "issueButton"
     );
 
+
   if(
+
     certificateID === "" ||
+
     studentName === "" ||
+
     courseName === "" ||
+
     issueDate === "" ||
+
     issuedBy === ""
+
   ){
 
     result.innerHTML =
+
       "<div class='error'>" +
+
       "⚠️ Please fill in all fields." +
+
       "</div>";
 
     return;
+
   }
+
 
   button.disabled = true;
 
+
   result.innerHTML =
+
     "<div class='loading'>" +
+
     "⏳ Saving certificate..." +
+
     "</div>";
+
 
   try{
 
-    const { data, error } =
+
+    const {
+      data,
+      error
+    } =
+
       await supabaseClient
+
         .from("certificates")
+
         .insert([
+
           {
+
             certificate_id:
               certificateID,
 
@@ -1475,129 +2567,310 @@ async function issueCertificate(){
 
             status:
               "Valid"
+
           }
+
         ])
+
         .select();
 
+
     if(error){
+
       throw error;
+
     }
+
 
     console.log(
       "Certificate saved:",
       data
     );
 
+
     const qrLink =
+
       "https://meena2356.github.io/CertiChain-/" +
+
       "?id=" +
+
       encodeURIComponent(
         certificateID
       );
 
-    /* PREMIUM CERTIFICATE */
+
+    /* ===============================================
+       PREMIUM CERTIFICATE
+    =============================================== */
 
     result.innerHTML =
 
+
       "<div class='certificate'>" +
+
 
       "<div class='certificate-border'>" +
 
+
       "<div class='certificate-top'>" +
+
       "🏆" +
+
       "</div>" +
 
-      "<h1>CERTIFICATE</h1>" +
 
-      "<h2>OF COMPLETION</h2>" +
+      "<h1>" +
+
+      "CERTIFICATE" +
+
+      "</h1>" +
+
+
+      "<h2>" +
+
+      "OF COMPLETION" +
+
+      "</h2>" +
+
 
       "<p class='cert-intro'>" +
+
       "This certificate is proudly presented to" +
+
       "</p>" +
 
+
       "<div class='student-name'>" +
-      escapeHTML(studentName) +
+
+      escapeHTML(
+        studentName
+      ) +
+
       "</div>" +
+
 
       "<div class='line'></div>" +
 
+
       "<p class='cert-intro'>" +
+
       "for successfully completing" +
+
       "</p>" +
 
+
       "<div class='course-name'>" +
-      escapeHTML(courseName) +
+
+      escapeHTML(
+        courseName
+      ) +
+
       "</div>" +
+
 
       "<div class='cert-info'>" +
 
+
       "<p>" +
+
       "<b>Certificate ID</b>" +
-      escapeHTML(certificateID) +
+
+      escapeHTML(
+        certificateID
+      ) +
+
       "</p>" +
 
+
       "<p>" +
+
       "<b>Issue Date</b>" +
-      escapeHTML(issueDate) +
+
+      escapeHTML(
+        issueDate
+      ) +
+
       "</p>" +
 
+
       "<p>" +
+
       "<b>Issued By</b>" +
-      escapeHTML(issuedBy) +
+
+      escapeHTML(
+        issuedBy
+      ) +
+
       "</p>" +
+
 
       "</div>" +
+
 
       "<div class='cert-status'>" +
+
       "✓ VERIFIED CERTIFICATE" +
+
       "</div>" +
 
+
       "<p class='qr-title'>" +
+
       "SCAN TO VERIFY" +
+
       "</p>" +
+
 
       "<div id='qrCode' class='qr-box'></div>" +
 
+
       "<div class='certificate-verified'>" +
+
       "VERIFIED BY CERTICHAIN" +
+
       "</div>" +
 
+
+      /* SIGNATURE */
+
+      "<div class='signature-seal-area'>" +
+
+
+      "<div class='signature-box'>" +
+
+
+      "<div class='signature-line'></div>" +
+
+
+      "<div class='signature-title'>" +
+
+      "Authorized Issuer" +
+
+      "</div>" +
+
+
+      "<div class='signature-name'>" +
+
+      escapeHTML(
+        issuedBy
+      ) +
+
+      "</div>" +
+
+
+      "</div>" +
+
+
+      /* SEAL */
+
+      "<div class='certichain-seal'>" +
+
+
+      "<div class='seal-inner'>" +
+
+
+      "<strong>" +
+
+      "CC" +
+
+      "</strong>" +
+
+
+      "<span>" +
+
+      "VERIFIED" +
+
+      "</span>" +
+
+
+      "</div>" +
+
+
+      "</div>" +
+
+
+      "</div>" +
+
+
+      /* PRINT */
+
       "<button " +
+
       "onclick='printCertificate()' " +
+
       "class='secondary'>" +
 
       "🖨️ Print / Save Certificate" +
 
       "</button>" +
 
+
+      /* REVOKE */
+
+      "<button " +
+
+      "onclick=\"revokeCertificate('" +
+
+      escapeJS(certificateID) +
+
+      "')\" " +
+
+      "class='revoke-button'>" +
+
+      "⚠️ Revoke Certificate" +
+
+      "</button>" +
+
+
       "</div>" +
+
 
       "</div>";
 
+
+    /* ===============================================
+       CREATE QR
+    =============================================== */
+
     const qrBox =
+
       document.getElementById(
         "qrCode"
       );
+
 
     if(qrBox){
 
       qrBox.innerHTML = "";
 
+
       new QRCode(
+
         qrBox,
+
         {
-          text:qrLink,
-          width:200,
-          height:200,
+
+          text:
+            qrLink,
+
+          width:
+            200,
+
+          height:
+            200,
 
           correctLevel:
             QRCode.CorrectLevel.H
+
         }
+
       );
 
     }
 
+
   }
+
 
   catch(error){
 
@@ -1606,23 +2879,31 @@ async function issueCertificate(){
       error
     );
 
+
     result.innerHTML =
+
       "<div class='error'>" +
 
       "<strong>" +
+
       "❌ Could not save certificate." +
+
       "</strong>" +
 
       "<br><br>" +
 
       escapeHTML(
+
         error.message ||
+
         "Database error."
+
       ) +
 
       "</div>";
 
   }
+
 
   finally{
 
@@ -1631,6 +2912,138 @@ async function issueCertificate(){
   }
 
 }
+
+
+
+/* =====================================================
+   REVOKE CERTIFICATE
+===================================================== */
+
+async function revokeCertificate(
+  certificateID
+){
+
+
+  const confirmRevoke =
+
+    confirm(
+
+      "⚠️ Are you sure you want to revoke certificate " +
+
+      certificateID +
+
+      "?\n\n" +
+
+      "After revocation, verification will show this certificate as REVOKED."
+
+    );
+
+
+  if(!confirmRevoke){
+
+    return;
+
+  }
+
+
+  try{
+
+
+    const {
+      data,
+      error
+    } =
+
+      await supabaseClient
+
+        .from("certificates")
+
+        .update({
+
+          status:
+            "Revoked"
+
+        })
+
+        .eq(
+
+          "certificate_id",
+
+          certificateID
+
+        )
+
+        .select();
+
+
+    if(error){
+
+      throw error;
+
+    }
+
+
+    console.log(
+      "Certificate revoked:",
+      data
+    );
+
+
+    alert(
+
+      "⚠️ Certificate " +
+
+      certificateID +
+
+      " has been revoked successfully."
+
+    );
+
+
+    /* ===============================================
+       VERIFY AGAIN
+    =============================================== */
+
+    document
+      .getElementById(
+        "certificateID"
+      )
+      .value =
+      certificateID;
+
+
+    verifyCertificate();
+
+
+  }
+
+
+  catch(error){
+
+    console.error(
+      "Revoke Error:",
+      error
+    );
+
+
+    alert(
+
+      "❌ Could not revoke certificate.\n\n" +
+
+      (
+
+        error.message ||
+
+        "Database error."
+
+      )
+
+    );
+
+  }
+
+}
+
 
 
 /* =====================================================
@@ -1669,26 +3082,72 @@ function escapeHTML(value){
 }
 
 
+
+/* =====================================================
+   ESCAPE JAVASCRIPT STRING
+===================================================== */
+
+function escapeJS(value){
+
+  return String(value)
+
+    .replace(
+      /\\/g,
+      "\\\\"
+    )
+
+    .replace(
+      /'/g,
+      "\\'"
+    )
+
+    .replace(
+      /"/g,
+      '\\"'
+    )
+
+    .replace(
+      /\n/g,
+      "\\n"
+    )
+
+    .replace(
+      /\r/g,
+      "\\r"
+    );
+
+}
+
+
+
 /* =====================================================
    ENTER KEY
 ===================================================== */
 
 document
+
   .getElementById(
     "certificateID"
   )
+
   .addEventListener(
+
     "keydown",
+
     function(event){
 
-      if(event.key === "Enter"){
+      if(
+        event.key === "Enter"
+      ){
 
         verifyCertificate();
 
       }
 
     }
+
   );
+
 
 
 /* =====================================================
@@ -1696,28 +3155,94 @@ document
 ===================================================== */
 
 window.addEventListener(
+
   "load",
+
   function(){
 
-    const params =
-      new URLSearchParams(
-        window.location.search
+
+    /* Set today's date */
+
+    const dateInput =
+
+      document.getElementById(
+        "issueDate"
       );
+
+
+    if(
+      dateInput &&
+      !dateInput.value
+    ){
+
+      const today =
+        new Date();
+
+
+      const year =
+        today.getFullYear();
+
+
+      const month =
+        String(
+          today.getMonth()+1
+        ).padStart(
+          2,
+          "0"
+        );
+
+
+      const day =
+        String(
+          today.getDate()
+        ).padStart(
+          2,
+          "0"
+        );
+
+
+      dateInput.value =
+
+        year +
+        "-" +
+        month +
+        "-" +
+        day;
+
+    }
+
+
+    /* QR ID */
+
+    const params =
+
+      new URLSearchParams(
+
+        window.location.search
+
+      );
+
 
     const qrID =
       params.get("id");
 
+
     if(qrID){
 
+
       const cleanID =
+
         qrID
           .trim()
           .toUpperCase();
 
+
       const input =
+
         document.getElementById(
           "certificateID"
         );
+
 
       if(input){
 
@@ -1726,19 +3251,25 @@ window.addEventListener(
 
       }
 
+
       setTimeout(
+
         function(){
 
           verifyCertificate();
 
         },
+
         1000
+
       );
 
     }
 
   }
+
 );
+
 
 
 /* =====================================================
@@ -1747,7 +3278,9 @@ window.addEventListener(
 
 async function adminLoginUser(){
 
+
   const email =
+
     document
       .getElementById(
         "adminEmail"
@@ -1755,50 +3288,76 @@ async function adminLoginUser(){
       .value
       .trim();
 
+
   const password =
+
     document
       .getElementById(
         "adminPassword"
       )
       .value;
 
+
   const result =
+
     document.getElementById(
       "loginResult"
     );
 
+
   const button =
+
     document.getElementById(
       "loginButton"
     );
 
-  if(!email || !password){
+
+  if(
+    !email ||
+    !password
+  ){
 
     result.innerHTML =
+
       "<span style='color:#b91c1c'>" +
+
       "⚠️ Please enter email and password." +
+
       "</span>";
 
     return;
 
   }
 
+
   button.disabled = true;
 
   button.innerText =
     "Logging in...";
 
+
   try{
 
-    const { data, error } =
-      await supabaseClient.auth
+
+    const {
+      data,
+      error
+    } =
+
+      await supabaseClient
+
+        .auth
+
         .signInWithPassword({
 
-          email:email,
+          email:
+            email,
 
-          password:password
+          password:
+            password
 
         });
+
 
     if(error){
 
@@ -1806,15 +3365,21 @@ async function adminLoginUser(){
 
     }
 
+
     console.log(
       "Admin login:",
       data
     );
 
+
     result.innerHTML =
+
       "<div class='login-success'>" +
+
       "✅ Admin login successful!" +
+
       "</div>";
+
 
     document
       .getElementById(
@@ -1823,11 +3388,13 @@ async function adminLoginUser(){
       .style.display =
       "block";
 
+
     document
       .getElementById(
         "adminLogin"
       )
       .innerHTML =
+
 
       "<div class='login-success'>" +
 
@@ -1835,16 +3402,21 @@ async function adminLoginUser(){
 
       "<br><br>" +
 
+
       "<button " +
+
       "onclick='adminLogout()'>" +
 
       "Logout" +
 
       "</button>" +
 
+
       "</div>";
 
+
   }
+
 
   catch(error){
 
@@ -1853,19 +3425,25 @@ async function adminLoginUser(){
       error
     );
 
+
     result.innerHTML =
+
       "<span style='color:#b91c1c'>" +
 
       "❌ Login failed: " +
 
       escapeHTML(
+
         error.message ||
+
         "Unable to login."
+
       ) +
 
       "</span>";
 
   }
+
 
   finally{
 
@@ -1879,17 +3457,22 @@ async function adminLoginUser(){
 }
 
 
+
 /* =====================================================
    ADMIN LOGOUT
 ===================================================== */
 
 async function adminLogout(){
 
-  await supabaseClient.auth.signOut();
+  await supabaseClient
+    .auth
+    .signOut();
+
 
   location.reload();
 
 }
+
 
 
 /* =====================================================
@@ -1903,16 +3486,22 @@ function printCertificate(){
 }
 
 
+
 /* =====================================================
    PRICING
 ===================================================== */
 
-function contactCertiChain(plan){
+function contactCertiChain(
+  plan
+){
+
 
   const name =
+
     prompt(
       "Your Name:"
     );
+
 
   if(!name){
 
@@ -1920,10 +3509,13 @@ function contactCertiChain(plan){
 
   }
 
+
   const email =
+
     prompt(
       "Your Email:"
     );
+
 
   if(!email){
 
@@ -1931,32 +3523,42 @@ function contactCertiChain(plan){
 
   }
 
+
   alert(
 
     "✅ Thank you, " +
+
     name +
+
     "!\n\n" +
 
     "We received your request for the " +
+
     plan +
+
     " plan.\n\n" +
 
     "Email: " +
+
     email
 
   );
+
 
   console.log(
 
     "CertiChain Plan Request\n\n" +
 
     "Plan: " +
+
     plan +
 
     "\nName: " +
+
     name +
 
     "\nEmail: " +
+
     email
 
   );
@@ -1965,5 +3567,7 @@ function contactCertiChain(plan){
 
 </script>
 
+
 </body>
-   </html>
+
+  </html>
