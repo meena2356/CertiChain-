@@ -1432,9 +1432,7 @@ footer{
 
 
 
-<!-- =====================================================
-     VERIFY
-===================================================== -->
+<!-- VERIFY -->
 
 <div
   class="card"
@@ -1468,9 +1466,7 @@ footer{
 
 
 
-<!-- =====================================================
-     ADMIN
-===================================================== -->
+<!-- ADMIN -->
 
 <div class="card">
 
@@ -1575,9 +1571,7 @@ footer{
 
 
 
-<!-- =====================================================
-     PRICING
-===================================================== -->
+<!-- PRICING -->
 
 <section class="pricing-section">
 
@@ -1615,17 +1609,11 @@ footer{
 
       <ul>
 
-        <li>
-          ✅ Digital Certificates
-        </li>
+        <li>✅ Digital Certificates</li>
 
-        <li>
-          ✅ QR Code Verification
-        </li>
+        <li>✅ QR Code Verification</li>
 
-        <li>
-          ✅ Online Verification
-        </li>
+        <li>✅ Online Verification</li>
 
       </ul>
 
@@ -1665,25 +1653,15 @@ footer{
 
       <ul>
 
-        <li>
-          ✅ Everything in Basic
-        </li>
+        <li>✅ Everything in Basic</li>
 
-        <li>
-          ✅ Custom Certificate Design
-        </li>
+        <li>✅ Custom Certificate Design</li>
 
-        <li>
-          ✅ Institution Logo
-        </li>
+        <li>✅ Institution Logo</li>
 
-        <li>
-          ✅ Certificate Management
-        </li>
+        <li>✅ Certificate Management</li>
 
-        <li>
-          ✅ Support
-        </li>
+        <li>✅ Support</li>
 
       </ul>
 
@@ -1719,25 +1697,15 @@ footer{
 
       <ul>
 
-        <li>
-          ✅ Everything in Professional
-        </li>
+        <li>✅ Everything in Professional</li>
 
-        <li>
-          ✅ Multiple Courses
-        </li>
+        <li>✅ Multiple Courses</li>
 
-        <li>
-          ✅ Large Certificate Volume
-        </li>
+        <li>✅ Large Certificate Volume</li>
 
-        <li>
-          ✅ Institution Page
-        </li>
+        <li>✅ Institution Page</li>
 
-        <li>
-          ✅ Priority Support
-        </li>
+        <li>✅ Priority Support</li>
 
       </ul>
 
@@ -1768,7 +1736,7 @@ const SUPABASE_URL =
 
 
 const SUPABASE_PUBLISHABLE_KEY =
-"sb_publishable_EP_DAGlDLKQHgWUqSNbNhA_6AGcdiYM";
+"sb_publishable_EP_DAGlDLkQHgWUqSNbNhA_6AGcdiYM";
 
 
 const supabaseClient =
@@ -1839,10 +1807,6 @@ async function verifyCertificate(){
 
   try{
 
-
-    /* ===============================================
-       CALL EDGE FUNCTION
-    =============================================== */
 
     const { data, error } =
 
@@ -1998,10 +1962,6 @@ async function verifyCertificate(){
       "Not available";
 
 
-    /* ===============================================
-       GET REAL STATUS FROM RESPONSE
-    =============================================== */
-
     let status =
 
       certificate.status ||
@@ -2010,11 +1970,6 @@ async function verifyCertificate(){
 
       null;
 
-
-    /* ===============================================
-       IF EDGE FUNCTION DOES NOT RETURN STATUS,
-       READ STATUS FROM SUPABASE TABLE
-    =============================================== */
 
     if(!status){
 
@@ -2069,10 +2024,6 @@ async function verifyCertificate(){
       );
 
 
-    /* ===============================================
-       REVOKED
-    =============================================== */
-
     if(isRevoked){
 
       result.innerHTML =
@@ -2097,82 +2048,47 @@ async function verifyCertificate(){
 
         "</div>" +
 
-
         "<div class='cert-info'>" +
 
-        "<p>" +
+        "<p><b>🆔 Certificate ID:</b><br>" +
 
-        "<b>🆔 Certificate ID:</b><br>" +
-
-        escapeHTML(
-          verifiedID
-        ) +
+        escapeHTML(verifiedID) +
 
         "</p>" +
 
+        "<p><b>👤 Student Name:</b><br>" +
 
-        "<p>" +
-
-        "<b>👤 Student Name:</b><br>" +
-
-        escapeHTML(
-          student
-        ) +
+        escapeHTML(student) +
 
         "</p>" +
 
+        "<p><b>📚 Course:</b><br>" +
 
-        "<p>" +
-
-        "<b>📚 Course:</b><br>" +
-
-        escapeHTML(
-          course
-        ) +
+        escapeHTML(course) +
 
         "</p>" +
 
+        "<p><b>📅 Issue Date:</b><br>" +
 
-        "<p>" +
-
-        "<b>📅 Issue Date:</b><br>" +
-
-        escapeHTML(
-          issueDate
-        ) +
+        escapeHTML(issueDate) +
 
         "</p>" +
 
+        "<p><b>🏫 Issued By:</b><br>" +
 
-        "<p>" +
-
-        "<b>🏫 Issued By:</b><br>" +
-
-        escapeHTML(
-          issuedBy
-        ) +
+        escapeHTML(issuedBy) +
 
         "</p>" +
 
-
-        "<p>" +
-
-        "<b>🔐 Certificate Hash:</b>" +
-
-        "</p>" +
-
+        "<p><b>🔐 Certificate Hash:</b></p>" +
 
         "<div class='hash'>" +
 
-        escapeHTML(
-          hash
-        ) +
+        escapeHTML(hash) +
 
         "</div>" +
 
-
         "</div>" +
-
 
         "<div style='text-align:center;margin-top:25px;'>" +
 
@@ -2182,29 +2098,20 @@ async function verifyCertificate(){
 
         "</div>" +
 
-
         "<p class='qr-title'>" +
 
         "📱 Scan to Check Certificate Status" +
 
         "</p>" +
 
-
         "<div id='verifyQRCode' class='qr-box'></div>" +
-
 
         "</div>" +
 
-
         "</div>";
-
 
     }
 
-
-    /* ===============================================
-       VALID
-    =============================================== */
 
     else{
 
@@ -2230,82 +2137,47 @@ async function verifyCertificate(){
 
         "</div>" +
 
-
         "<div class='cert-info'>" +
 
-        "<p>" +
+        "<p><b>🆔 Certificate ID:</b><br>" +
 
-        "<b>🆔 Certificate ID:</b><br>" +
-
-        escapeHTML(
-          verifiedID
-        ) +
+        escapeHTML(verifiedID) +
 
         "</p>" +
 
+        "<p><b>👤 Student Name:</b><br>" +
 
-        "<p>" +
-
-        "<b>👤 Student Name:</b><br>" +
-
-        escapeHTML(
-          student
-        ) +
+        escapeHTML(student) +
 
         "</p>" +
 
+        "<p><b>📚 Course:</b><br>" +
 
-        "<p>" +
-
-        "<b>📚 Course:</b><br>" +
-
-        escapeHTML(
-          course
-        ) +
+        escapeHTML(course) +
 
         "</p>" +
 
+        "<p><b>📅 Issue Date:</b><br>" +
 
-        "<p>" +
-
-        "<b>📅 Issue Date:</b><br>" +
-
-        escapeHTML(
-          issueDate
-        ) +
+        escapeHTML(issueDate) +
 
         "</p>" +
 
+        "<p><b>🏫 Issued By:</b><br>" +
 
-        "<p>" +
-
-        "<b>🏫 Issued By:</b><br>" +
-
-        escapeHTML(
-          issuedBy
-        ) +
+        escapeHTML(issuedBy) +
 
         "</p>" +
 
-
-        "<p>" +
-
-        "<b>🔐 Certificate Hash:</b>" +
-
-        "</p>" +
-
+        "<p><b>🔐 Certificate Hash:</b></p>" +
 
         "<div class='hash'>" +
 
-        escapeHTML(
-          hash
-        ) +
+        escapeHTML(hash) +
 
         "</div>" +
 
-
         "</div>" +
-
 
         "<div style='text-align:center;margin-top:25px;'>" +
 
@@ -2315,28 +2187,20 @@ async function verifyCertificate(){
 
         "</div>" +
 
-
         "<p class='qr-title'>" +
 
         "📱 Scan to Verify Certificate" +
 
         "</p>" +
 
-
         "<div id='verifyQRCode' class='qr-box'></div>" +
 
-
         "</div>" +
-
 
         "</div>";
 
     }
 
-
-    /* ===============================================
-       CREATE QR
-    =============================================== */
 
     const qrBox =
 
@@ -2599,18 +2463,11 @@ async function issueCertificate(){
       );
 
 
-    /* ===============================================
-       PREMIUM CERTIFICATE
-    =============================================== */
-
     result.innerHTML =
-
 
       "<div class='certificate'>" +
 
-
       "<div class='certificate-border'>" +
-
 
       "<div class='certificate-top'>" +
 
@@ -2618,13 +2475,11 @@ async function issueCertificate(){
 
       "</div>" +
 
-
       "<h1>" +
 
       "CERTIFICATE" +
 
       "</h1>" +
-
 
       "<h2>" +
 
@@ -2632,25 +2487,19 @@ async function issueCertificate(){
 
       "</h2>" +
 
-
       "<p class='cert-intro'>" +
 
       "This certificate is proudly presented to" +
 
       "</p>" +
 
-
       "<div class='student-name'>" +
 
-      escapeHTML(
-        studentName
-      ) +
+      escapeHTML(studentName) +
 
       "</div>" +
 
-
       "<div class='line'></div>" +
-
 
       "<p class='cert-intro'>" +
 
@@ -2658,54 +2507,39 @@ async function issueCertificate(){
 
       "</p>" +
 
-
       "<div class='course-name'>" +
 
-      escapeHTML(
-        courseName
-      ) +
+      escapeHTML(courseName) +
 
       "</div>" +
 
-
       "<div class='cert-info'>" +
-
 
       "<p>" +
 
       "<b>Certificate ID</b>" +
 
-      escapeHTML(
-        certificateID
-      ) +
+      escapeHTML(certificateID) +
 
       "</p>" +
-
 
       "<p>" +
 
       "<b>Issue Date</b>" +
 
-      escapeHTML(
-        issueDate
-      ) +
+      escapeHTML(issueDate) +
 
       "</p>" +
-
 
       "<p>" +
 
       "<b>Issued By</b>" +
 
-      escapeHTML(
-        issuedBy
-      ) +
+      escapeHTML(issuedBy) +
 
       "</p>" +
 
-
       "</div>" +
-
 
       "<div class='cert-status'>" +
 
@@ -2713,16 +2547,13 @@ async function issueCertificate(){
 
       "</div>" +
 
-
       "<p class='qr-title'>" +
 
       "SCAN TO VERIFY" +
 
       "</p>" +
 
-
       "<div id='qrCode' class='qr-box'></div>" +
-
 
       "<div class='certificate-verified'>" +
 
@@ -2730,17 +2561,11 @@ async function issueCertificate(){
 
       "</div>" +
 
-
-      /* SIGNATURE */
-
       "<div class='signature-seal-area'>" +
-
 
       "<div class='signature-box'>" +
 
-
       "<div class='signature-line'></div>" +
-
 
       "<div class='signature-title'>" +
 
@@ -2748,26 +2573,17 @@ async function issueCertificate(){
 
       "</div>" +
 
-
       "<div class='signature-name'>" +
 
-      escapeHTML(
-        issuedBy
-      ) +
+      escapeHTML(issuedBy) +
 
       "</div>" +
 
-
       "</div>" +
-
-
-      /* SEAL */
 
       "<div class='certichain-seal'>" +
 
-
       "<div class='seal-inner'>" +
-
 
       "<strong>" +
 
@@ -2775,24 +2591,17 @@ async function issueCertificate(){
 
       "</strong>" +
 
-
       "<span>" +
 
       "VERIFIED" +
 
       "</span>" +
 
+      "</div>" +
 
       "</div>" +
 
-
       "</div>" +
-
-
-      "</div>" +
-
-
-      /* PRINT */
 
       "<button " +
 
@@ -2803,9 +2612,6 @@ async function issueCertificate(){
       "🖨️ Print / Save Certificate" +
 
       "</button>" +
-
-
-      /* REVOKE */
 
       "<button " +
 
@@ -2821,16 +2627,10 @@ async function issueCertificate(){
 
       "</button>" +
 
-
       "</div>" +
-
 
       "</div>";
 
-
-    /* ===============================================
-       CREATE QR
-    =============================================== */
 
     const qrBox =
 
@@ -3000,10 +2800,6 @@ async function revokeCertificate(
     );
 
 
-    /* ===============================================
-       VERIFY AGAIN
-    =============================================== */
-
     document
       .getElementById(
         "certificateID"
@@ -3161,8 +2957,6 @@ window.addEventListener(
   function(){
 
 
-    /* Set today's date */
-
     const dateInput =
 
       document.getElementById(
@@ -3211,8 +3005,6 @@ window.addEventListener(
 
     }
 
-
-    /* QR ID */
 
     const params =
 
