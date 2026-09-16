@@ -10,9 +10,7 @@
   content="width=device-width, initial-scale=1.0"
 >
 
-<title>
-CertiChain — Digital Certificate Verification
-</title>
+<title>CertiChain — Digital Certificate Verification</title>
 
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 
@@ -31,8 +29,7 @@ html{
 body{
   margin:0;
   font-family:Arial,Helvetica,sans-serif;
-  background:
-    linear-gradient(135deg,#eaf4ff,#f7fbff 45%,#eef5ff);
+  background:linear-gradient(135deg,#eaf4ff,#f7fbff 45%,#eef5ff);
   color:#172033;
   min-height:100vh;
 }
@@ -44,8 +41,7 @@ body{
 }
 
 header{
-  background:
-    linear-gradient(135deg,#0b4f8a,#1769aa,#2585c7);
+  background:linear-gradient(135deg,#0b4f8a,#1769aa,#2585c7);
   color:white;
   padding:55px 20px;
   text-align:center;
@@ -139,6 +135,12 @@ button:hover{
   transform:translateY(-1px);
 }
 
+button:disabled{
+  cursor:not-allowed;
+  transform:none;
+  opacity:.7;
+}
+
 .primary{
   background:#1769aa;
   color:white;
@@ -151,7 +153,6 @@ button:hover{
 .secondary{
   background:#edf5fb;
   color:#1769aa;
-  margin-bottom:15px;
 }
 
 .secondary:hover{
@@ -275,6 +276,7 @@ button:hover{
   display:flex;
   gap:10px;
   flex-wrap:wrap;
+  margin-bottom:5px;
 }
 
 .dashboard-actions button{
@@ -327,6 +329,7 @@ button:hover{
   padding:15px;
   border-radius:12px;
   margin-top:15px;
+  line-height:1.6;
 }
 
 .success-message{
@@ -336,6 +339,7 @@ button:hover{
   padding:15px;
   border-radius:12px;
   margin-top:15px;
+  line-height:1.6;
 }
 
 /* PRICING */
@@ -414,8 +418,6 @@ button:hover{
   color:white;
 }
 
-/* ADMIN */
-
 .admin-box{
   max-width:500px;
   margin:auto;
@@ -427,8 +429,6 @@ button:hover{
   font-size:14px;
   line-height:1.6;
 }
-
-/* FOOTER */
 
 footer{
   background:#0e3557;
@@ -470,15 +470,6 @@ footer p{
 
   #issueSection{
     display:block !important;
-  }
-
-  .certificate-print{
-    display:block !important;
-  }
-
-  .card{
-    box-shadow:none;
-    border:none;
   }
 
 }
@@ -531,6 +522,7 @@ footer p{
 </head>
 
 <body>
+
 
 <header>
 
@@ -594,19 +586,22 @@ footer p{
       <h2>🔐 Admin Login</h2>
 
       <p class="description">
-        Login to manage certificates and issue new certificates.
+        Login with your CertiChain Supabase account to manage certificates.
       </p>
 
       <input
         id="adminEmail"
         type="email"
+        value="ghanizadazuhal380@gmail.com"
         placeholder="Admin Email"
+        autocomplete="email"
       >
 
       <input
         id="adminPassword"
         type="password"
         placeholder="Password"
+        autocomplete="current-password"
       >
 
       <button
@@ -618,7 +613,7 @@ footer p{
       </button>
 
       <p class="admin-note">
-        Demo admin access for CertiChain management.
+        Your password is handled by Supabase Authentication.
       </p>
 
       <div id="loginResult"></div>
@@ -707,8 +702,6 @@ footer p{
     </div>
 
 
-    <!-- SEARCH -->
-
     <input
       id="dashboardSearch"
       type="text"
@@ -716,8 +709,6 @@ footer p{
       oninput="loadDashboard()"
     >
 
-
-    <!-- STATUS FILTER -->
 
     <select
       id="dashboardStatus"
@@ -848,12 +839,6 @@ footer p{
 
     </div>
 
-
-    <div
-      id="certificatePrintArea"
-      class="certificate-print"
-    ></div>
-
   </div>
 
 </section>
@@ -874,8 +859,6 @@ footer p{
 
     <div class="pricing-grid">
 
-
-      <!-- BASIC -->
 
       <div class="price-card">
 
@@ -908,8 +891,6 @@ footer p{
 
       </div>
 
-
-      <!-- PROFESSIONAL -->
 
       <div class="price-card featured">
 
@@ -948,8 +929,6 @@ footer p{
 
       </div>
 
-
-      <!-- INSTITUTION -->
 
       <div class="price-card">
 
@@ -1015,7 +994,7 @@ footer p{
 <script>
 
 /* =========================================================
-   SUPABASE CONFIGURATION
+   SUPABASE
 ========================================================= */
 
 const SUPABASE_URL =
@@ -1023,7 +1002,6 @@ const SUPABASE_URL =
 
 const SUPABASE_KEY =
 "sb_publishable_EP_DAGlDLkQHgWUqSNbNhA_6AGcdiYM";
-
 
 const supabaseClient =
 supabase.createClient(
@@ -1038,8 +1016,13 @@ supabase.createClient(
 
 function escapeHtml(value){
 
-  if(value === null || value === undefined){
+  if(
+    value === null ||
+    value === undefined
+  ){
+
     return "";
+
   }
 
   return String(value)
@@ -1048,13 +1031,19 @@ function escapeHtml(value){
     .replace(/>/g,"&gt;")
     .replace(/"/g,"&quot;")
     .replace(/'/g,"&#039;");
+
 }
 
 
-function showError(elementId,message){
+function showError(
+  elementId,
+  message
+){
 
   const element =
-    document.getElementById(elementId);
+    document.getElementById(
+      elementId
+    );
 
   if(element){
 
@@ -1068,19 +1057,207 @@ function showError(elementId,message){
 }
 
 
-function showSuccess(elementId,message){
+/* =========================================================
+   AUTH UI
+========================================================= */
 
-  const element =
-    document.getElementById(elementId);
+function showAdminArea(){
 
-  if(element){
+  document
+    .getElementById("dashboardSection")
+    .style.display = "block";
 
-    element.innerHTML =
+  document
+    .getElementById("issueSection")
+    .style.display = "block";
+
+}
+
+
+function hideAdminArea(){
+
+  document
+    .getElementById("dashboardSection")
+    .style.display = "none";
+
+  document
+    .getElementById("issueSection")
+    .style.display = "none";
+
+}
+
+
+/* =========================================================
+   REAL SUPABASE LOGIN
+========================================================= */
+
+async function adminLoginUser(){
+
+  const email =
+    document
+      .getElementById("adminEmail")
+      .value
+      .trim();
+
+  const password =
+    document
+      .getElementById("adminPassword")
+      .value;
+
+  const loginResult =
+    document.getElementById(
+      "loginResult"
+    );
+
+
+  if(
+    !email ||
+    !password
+  ){
+
+    loginResult.innerHTML =
+      `<div class="error">
+        ⚠️ Please enter your email and password.
+      </div>`;
+
+    return;
+
+  }
+
+
+  loginResult.innerHTML =
+    `<div class="dashboard-card">
+      🔄 Signing in to Supabase...
+    </div>`;
+
+
+  try{
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient.auth.signInWithPassword({
+        email:email,
+        password:password
+      });
+
+
+    if(error){
+
+      console.error(
+        "Supabase Login Error:",
+        error
+      );
+
+
+      loginResult.innerHTML =
+        `<div class="error">
+          ❌ Login failed.<br><br>
+          ${escapeHtml(error.message)}
+        </div>`;
+
+      return;
+
+    }
+
+
+    if(
+      !data ||
+      !data.session
+    ){
+
+      loginResult.innerHTML =
+        `<div class="error">
+          ❌ Login session was not created.
+        </div>`;
+
+      return;
+
+    }
+
+
+    showAdminArea();
+
+
+    loginResult.innerHTML =
       `<div class="success-message">
-        ✅ ${escapeHtml(message)}
+        ✅ Login successful!<br>
+        Welcome to CertiChain Dashboard.
+      </div>`;
+
+
+    document
+      .getElementById("adminPassword")
+      .value = "";
+
+
+    await loadDashboard();
+
+
+    setTimeout(function(){
+
+      document
+        .getElementById("dashboardSection")
+        .scrollIntoView({
+          behavior:"smooth"
+        });
+
+    },300);
+
+
+  }catch(error){
+
+    console.error(
+      "Unexpected login error:",
+      error
+    );
+
+
+    loginResult.innerHTML =
+      `<div class="error">
+        ❌ Something went wrong during login.
       </div>`;
 
   }
+
+}
+
+
+/* =========================================================
+   LOGOUT
+========================================================= */
+
+async function logoutAdmin(){
+
+  try{
+
+    await supabaseClient.auth.signOut();
+
+  }catch(error){
+
+    console.error(
+      "Logout error:",
+      error
+    );
+
+  }
+
+
+  hideAdminArea();
+
+
+  document
+    .getElementById("adminPassword")
+    .value = "";
+
+
+  document
+    .getElementById("loginResult")
+    .innerHTML =
+      `<div class="success-message">
+        👋 You have been logged out.
+      </div>`;
 
 }
 
@@ -1092,10 +1269,14 @@ function showSuccess(elementId,message){
 async function verifyCertificate(){
 
   const input =
-    document.getElementById("certificateId");
+    document.getElementById(
+      "certificateId"
+    );
 
   const result =
-    document.getElementById("verifyResult");
+    document.getElementById(
+      "verifyResult"
+    );
 
   const certificateId =
     input.value.trim();
@@ -1121,12 +1302,16 @@ async function verifyCertificate(){
 
   try{
 
-    const { data, error } =
+    const {
+      data,
+      error
+    } =
       await supabaseClient.functions.invoke(
         "Verify_Certificate-",
         {
           body:{
-            certificateId:certificateId
+            certificateId:
+              certificateId
           }
         }
       );
@@ -1147,7 +1332,8 @@ async function verifyCertificate(){
       result.innerHTML =
         `<div class="error">
           ❌ ${escapeHtml(
-            data.message || "Certificate not found."
+            data.message ||
+            "Certificate not found."
           )}
         </div>`;
 
@@ -1170,11 +1356,6 @@ async function verifyCertificate(){
     }
 
 
-    /*
-      If Edge Function does not return full
-      certificate details, fetch directly.
-    */
-
     if(!certificate){
 
       const response =
@@ -1193,6 +1374,7 @@ async function verifyCertificate(){
         throw response.error;
 
       }
+
 
       certificate =
         response.data;
@@ -1213,7 +1395,8 @@ async function verifyCertificate(){
 
 
     const status =
-      certificate.status || "Valid";
+      certificate.status ||
+      "Valid";
 
 
     const statusClass =
@@ -1241,7 +1424,10 @@ async function verifyCertificate(){
 
         <h3>
           ${statusIcon}
-          Certificate ${escapeHtml(certificate.certificate_id)}
+          Certificate
+          ${escapeHtml(
+            certificate.certificate_id
+          )}
         </h3>
 
 
@@ -1252,7 +1438,9 @@ async function verifyCertificate(){
           </span>
 
           <span>
-            ${escapeHtml(certificate.certificate_id)}
+            ${escapeHtml(
+              certificate.certificate_id
+            )}
           </span>
 
         </div>
@@ -1265,7 +1453,9 @@ async function verifyCertificate(){
           </span>
 
           <span>
-            ${escapeHtml(certificate.student_name)}
+            ${escapeHtml(
+              certificate.student_name
+            )}
           </span>
 
         </div>
@@ -1278,7 +1468,9 @@ async function verifyCertificate(){
           </span>
 
           <span>
-            ${escapeHtml(certificate.course_name)}
+            ${escapeHtml(
+              certificate.course_name
+            )}
           </span>
 
         </div>
@@ -1291,7 +1483,9 @@ async function verifyCertificate(){
           </span>
 
           <span>
-            ${escapeHtml(certificate.issue_date)}
+            ${escapeHtml(
+              certificate.issue_date
+            )}
           </span>
 
         </div>
@@ -1304,7 +1498,9 @@ async function verifyCertificate(){
           </span>
 
           <span>
-            ${escapeHtml(certificate.issued_by)}
+            ${escapeHtml(
+              certificate.issued_by
+            )}
           </span>
 
         </div>
@@ -1316,7 +1512,9 @@ async function verifyCertificate(){
             Status
           </span>
 
-          <span class="${statusClass}">
+          <span
+            class="${statusClass}"
+          >
             ${statusIcon}
             ${escapeHtml(status)}
           </span>
@@ -1325,8 +1523,15 @@ async function verifyCertificate(){
 
 
         <div class="hash-box">
-          <strong>SHA-256 Hash:</strong><br><br>
+
+          <strong>
+            SHA-256 Hash:
+          </strong>
+
+          <br><br>
+
           ${escapeHtml(hash)}
+
         </div>
 
 
@@ -1342,7 +1547,6 @@ async function verifyCertificate(){
             style="
               color:#667085;
               font-size:13px;
-              margin-top:10px;
             "
           >
             Scan this QR code to verify the certificate.
@@ -1386,11 +1590,14 @@ async function verifyCertificate(){
         </div>
 
       </div>
+
     `;
 
 
     const qrElement =
-      document.getElementById("qrcode");
+      document.getElementById(
+        "qrcode"
+      );
 
 
     if(qrElement){
@@ -1411,7 +1618,8 @@ async function verifyCertificate(){
           height:180,
           colorDark:"#172033",
           colorLight:"#ffffff",
-          correctLevel:QRCode.CorrectLevel.H
+          correctLevel:
+            QRCode.CorrectLevel.H
         }
       );
 
@@ -1428,140 +1636,11 @@ async function verifyCertificate(){
 
     result.innerHTML =
       `<div class="error">
-        ❌ Verification failed.
+        ❌ Verification failed.<br><br>
         Please check the Certificate ID and try again.
       </div>`;
 
   }
-
-}
-
-
-/* =========================================================
-   ADMIN LOGIN
-========================================================= */
-
-function adminLoginUser(){
-
-  const email =
-    document
-      .getElementById("adminEmail")
-      .value
-      .trim();
-
-
-  const password =
-    document
-      .getElementById("adminPassword")
-      .value
-      .trim();
-
-
-  const loginResult =
-    document.getElementById(
-      "loginResult"
-    );
-
-
-  /*
-    Demo login.
-    Replace these credentials with your
-    preferred admin credentials if needed.
-  */
-
-  if(
-    email === "admin@certichain.com" &&
-    password === "certichain123"
-  ){
-
-    localStorage.setItem(
-      "certichainAdmin",
-      "true"
-    );
-
-
-    document
-      .getElementById("dashboardSection")
-      .style.display = "block";
-
-
-    document
-      .getElementById("issueSection")
-      .style.display = "block";
-
-
-    loginResult.innerHTML =
-      `<div class="success-message">
-        ✅ Login successful.
-      </div>`;
-
-
-    loadDashboard();
-
-
-    setTimeout(
-      function(){
-
-        document
-          .getElementById("dashboardSection")
-          .scrollIntoView({
-            behavior:"smooth"
-          });
-
-      },
-      300
-    );
-
-
-  }else{
-
-    loginResult.innerHTML =
-      `<div class="error">
-        ❌ Invalid admin email or password.
-      </div>`;
-
-  }
-
-}
-
-
-/* =========================================================
-   LOGOUT
-========================================================= */
-
-function logoutAdmin(){
-
-  localStorage.removeItem(
-    "certichainAdmin"
-  );
-
-
-  document
-    .getElementById("dashboardSection")
-    .style.display = "none";
-
-
-  document
-    .getElementById("issueSection")
-    .style.display = "none";
-
-
-  document
-    .getElementById("adminEmail")
-    .value = "";
-
-
-  document
-    .getElementById("adminPassword")
-    .value = "";
-
-
-  document
-    .getElementById("loginResult")
-    .innerHTML =
-      `<div class="success-message">
-        👋 Logged out successfully.
-      </div>`;
 
 }
 
@@ -1618,8 +1697,8 @@ async function loadDashboard(){
   try{
 
     /*
-      First load all certificates for
-      dashboard statistics.
+      LOAD ALL CERTIFICATES
+      FOR STATISTICS
     */
 
     const allResponse =
@@ -1654,7 +1733,8 @@ async function loadDashboard(){
     const valid =
       allCertificates.filter(
         item =>
-          (item.status || "Valid") === "Valid"
+          (item.status || "Valid")
+          === "Valid"
       ).length;
 
 
@@ -1669,25 +1749,28 @@ async function loadDashboard(){
       .getElementById(
         "totalCertificates"
       )
-      .textContent = total;
+      .textContent =
+        total;
 
 
     document
       .getElementById(
         "validCertificates"
       )
-      .textContent = valid;
+      .textContent =
+        valid;
 
 
     document
       .getElementById(
         "revokedCertificates"
       )
-      .textContent = revoked;
+      .textContent =
+        revoked;
 
 
     /*
-      Build filtered dashboard query.
+      FILTERED QUERY
     */
 
     let query =
@@ -1734,7 +1817,8 @@ async function loadDashboard(){
     const {
       data,
       error
-    } = await query;
+    } =
+      await query;
 
 
     if(error){
@@ -1748,7 +1832,9 @@ async function loadDashboard(){
       data || [];
 
 
-    if(certificates.length === 0){
+    if(
+      certificates.length === 0
+    ){
 
       dashboardResult.innerHTML =
         `<div class="empty">
@@ -1766,7 +1852,8 @@ async function loadDashboard(){
           certificate => {
 
             const status =
-              certificate.status || "Valid";
+              certificate.status ||
+              "Valid";
 
 
             const statusClass =
@@ -1906,6 +1993,18 @@ async function loadDashboard(){
                   `
                 }
 
+
+                <button
+                  class="secondary"
+                  style="
+                    width:100%;
+                    margin-top:10px;
+                  "
+                  onclick="verifyFromDashboard('${escapeHtml(certificate.certificate_id)}')"
+                >
+                  🔎 View / Verify
+                </button>
+
               </div>
 
             `;
@@ -1925,8 +2024,11 @@ async function loadDashboard(){
 
     dashboardResult.innerHTML =
       `<div class="error">
-        ❌ Could not load certificates.
-        Please check your Supabase connection.
+        ❌ Could not load certificates.<br><br>
+        ${escapeHtml(
+          error.message ||
+          "Please check your Supabase connection."
+        )}
       </div>`;
 
   }
@@ -2016,12 +2118,10 @@ async function issueCertificate(){
 
   try{
 
-    /*
-      Check whether Certificate ID
-      already exists.
-    */
-
-    const existing =
+    const {
+      data:existing,
+      error:existingError
+    } =
       await supabaseClient
         .from("certificates")
         .select("certificate_id")
@@ -2032,14 +2132,14 @@ async function issueCertificate(){
         .maybeSingle();
 
 
-    if(existing.error){
+    if(existingError){
 
-      throw existing.error;
+      throw existingError;
 
     }
 
 
-    if(existing.data){
+    if(existing){
 
       showError(
         "issueResult",
@@ -2130,10 +2230,6 @@ async function issueCertificate(){
     `;
 
 
-    /*
-      Clear form
-    */
-
     document
       .getElementById(
         "newCertificateId"
@@ -2162,11 +2258,7 @@ async function issueCertificate(){
       .value = "";
 
 
-    /*
-      Refresh dashboard
-    */
-
-    loadDashboard();
+    await loadDashboard();
 
 
   }catch(error){
@@ -2179,6 +2271,7 @@ async function issueCertificate(){
 
     showError(
       "issueResult",
+      error.message ||
       "Could not create certificate."
     );
 
@@ -2268,7 +2361,7 @@ async function revokeCertificate(
     );
 
 
-    loadDashboard();
+    await loadDashboard();
 
 
   }catch(error){
@@ -2280,6 +2373,7 @@ async function revokeCertificate(
 
 
     alert(
+      error.message ||
       "Could not revoke certificate."
     );
 
@@ -2289,7 +2383,7 @@ async function revokeCertificate(
 
 
 /* =========================================================
-   PRINT CERTIFICATE
+   PRINT
 ========================================================= */
 
 function printCertificate(){
@@ -2348,16 +2442,106 @@ function contactCertiChain(
 
 
 /* =========================================================
-   AUTO LOGIN CHECK
+   CHECK CURRENT AUTH SESSION
+========================================================= */
+
+async function checkCurrentSession(){
+
+  try{
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient.auth.getSession();
+
+
+    if(error){
+
+      console.error(
+        "Session error:",
+        error
+      );
+
+      hideAdminArea();
+
+      return;
+
+    }
+
+
+    if(
+      data &&
+      data.session
+    ){
+
+      showAdminArea();
+
+      await loadDashboard();
+
+    }else{
+
+      hideAdminArea();
+
+    }
+
+
+  }catch(error){
+
+    console.error(
+      "Session check error:",
+      error
+    );
+
+    hideAdminArea();
+
+  }
+
+}
+
+
+/* =========================================================
+   AUTH STATE LISTENER
+========================================================= */
+
+supabaseClient.auth.onAuthStateChange(
+  async function(
+    event,
+    session
+  ){
+
+    if(
+      event === "SIGNED_IN" &&
+      session
+    ){
+
+      showAdminArea();
+
+    }
+
+
+    if(
+      event === "SIGNED_OUT"
+    ){
+
+      hideAdminArea();
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   PAGE LOAD
 ========================================================= */
 
 window.addEventListener(
   "DOMContentLoaded",
-  function(){
+  async function(){
 
     /*
-      Set today's date as default
-      for issuing certificates.
+      Today's date
     */
 
     const today =
@@ -2381,39 +2565,14 @@ window.addEventListener(
 
 
     /*
-      Auto open dashboard if admin
-      was already logged in.
+      Check real Supabase session
     */
 
-    if(
-      localStorage.getItem(
-        "certichainAdmin"
-      ) === "true"
-    ){
-
-      document
-        .getElementById(
-          "dashboardSection"
-        )
-        .style.display =
-          "block";
-
-
-      document
-        .getElementById(
-          "issueSection"
-        )
-        .style.display =
-          "block";
-
-
-      loadDashboard();
-
-    }
+    await checkCurrentSession();
 
 
     /*
-      Allow URL:
+      URL verification:
       ?id=CERT-0010
     */
 
