@@ -13,14 +13,22 @@
 <title>CertiChain — Digital Certificate Verification</title>
 
 <!-- QR CODE -->
-<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script
+  src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"
+  defer>
+</script>
 
 <!-- SUPABASE -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script
+  src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+  defer>
+</script>
 
 <!-- EMAILJS -->
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-
+<script
+  src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"
+  defer>
+</script>
 
 <style>
 
@@ -84,7 +92,8 @@ h3{
 }
 
 input,
-select{
+select,
+textarea{
   width:100%;
   padding:13px;
   border:1px solid #cbd6e2;
@@ -109,6 +118,10 @@ button:hover{
   opacity:.9;
 }
 
+button:active{
+  transform:scale(.98);
+}
+
 .btn-danger{
   background:#c62828;
 }
@@ -123,6 +136,10 @@ button:hover{
 
 .btn-gold{
   background:#c28a16;
+}
+
+.btn-dark{
+  background:#17263a;
 }
 
 .hidden{
@@ -177,6 +194,36 @@ button:hover{
   border-radius:10px;
   background:#fff;
   position:relative;
+  color:#17263a;
+}
+
+.certificate:before{
+  content:"";
+  position:absolute;
+  inset:8px;
+  border:1px solid #c28a16;
+  border-radius:5px;
+  pointer-events:none;
+}
+
+.certificate-inner{
+  position:relative;
+  z-index:1;
+}
+
+.brand-logo{
+  width:90px;
+  height:90px;
+  object-fit:contain;
+  border-radius:12px;
+  margin:0 auto 10px;
+}
+
+.brand-name{
+  color:#174f82;
+  font-size:18px;
+  font-weight:bold;
+  margin-bottom:12px;
 }
 
 .certificate h1{
@@ -350,22 +397,41 @@ th{
   margin:auto;
 }
 
-.contact-box textarea{
-  width:100%;
-  min-height:130px;
-  padding:13px;
-  border:1px solid #cbd6e2;
-  border-radius:10px;
-  resize:vertical;
-  font-family:Arial;
+.small-note{
+  color:#64748b;
+  font-size:13px;
+  line-height:1.6;
 }
 
-footer{
-  text-align:center;
-  padding:30px 15px;
-  color:#d6ecff;
-  background:rgba(0,0,0,.25);
-  margin-top:30px;
+.branding-box{
+  background:#f4f8fc;
+  border:1px solid #d9e5ef;
+  border-radius:15px;
+  padding:20px;
+  margin:20px 0 25px;
+}
+
+.branding-preview{
+  display:flex;
+  align-items:center;
+  gap:15px;
+  padding:15px;
+  background:white;
+  border-radius:12px;
+  margin-top:15px;
+}
+
+.branding-preview img{
+  width:65px;
+  height:65px;
+  object-fit:contain;
+  border-radius:10px;
+}
+
+.branding-preview strong{
+  display:block;
+  color:#12365d;
+  font-size:18px;
 }
 
 .message{
@@ -385,6 +451,20 @@ footer{
   display:block;
   background:#ffe0e0;
   color:#a00000;
+}
+
+.message.info{
+  display:block;
+  background:#e1f0ff;
+  color:#14548a;
+}
+
+footer{
+  text-align:center;
+  padding:30px 15px;
+  color:#d6ecff;
+  background:rgba(0,0,0,.25);
+  margin-top:30px;
 }
 
 @media(max-width:750px){
@@ -412,7 +492,7 @@ footer{
   }
 
   .certificate{
-    padding:20px 12px;
+    padding:25px 12px;
   }
 
   .certificate h1{
@@ -423,20 +503,23 @@ footer{
     font-size:24px;
   }
 
+  .branding-preview{
+    flex-direction:column;
+    text-align:center;
+  }
+
 }
 
 </style>
 
 </head>
 
-
 <body>
-
 
 <header>
 
   <div class="logo">
-    🏆 <span>CertiChain</span>
+    🏆 <span id="headerBrandName">CertiChain</span>
   </div>
 
   <p>Digital Certificate Verification System</p>
@@ -447,7 +530,7 @@ footer{
 <div class="container">
 
 
-<!-- ================= HERO ================= -->
+<!-- HERO -->
 
 <section class="hero">
 
@@ -468,7 +551,7 @@ footer{
       placeholder="Enter Certificate ID e.g. CERT-001"
     >
 
-    <button onclick="verifyCertificate()">
+    <button type="button" onclick="verifyCertificate()">
       Verify
     </button>
 
@@ -479,7 +562,7 @@ footer{
 </section>
 
 
-<!-- ================= VERIFICATION RESULT ================= -->
+<!-- RESULT -->
 
 <section
   id="verificationSection"
@@ -493,7 +576,7 @@ footer{
 </section>
 
 
-<!-- ================= ADMIN LOGIN ================= -->
+<!-- LOGIN -->
 
 <section
   id="loginSection"
@@ -519,7 +602,10 @@ footer{
     placeholder="Password"
   >
 
-  <button onclick="adminLogin()">
+  <button
+    type="button"
+    onclick="adminLogin()"
+  >
     Login
   </button>
 
@@ -528,7 +614,7 @@ footer{
 </section>
 
 
-<!-- ================= ADMIN DASHBOARD ================= -->
+<!-- DASHBOARD -->
 
 <section
   id="dashboardSection"
@@ -544,13 +630,17 @@ footer{
   ">
 
     <div>
+
       <h2>📊 Admin Dashboard</h2>
+
       <p style="color:#64748b;">
         Manage your certificates
       </p>
+
     </div>
 
     <button
+      type="button"
       class="btn-secondary"
       onclick="adminLogout()"
     >
@@ -559,8 +649,6 @@ footer{
 
   </div>
 
-
-  <!-- STATS -->
 
   <div class="stats">
 
@@ -582,8 +670,6 @@ footer{
   </div>
 
 
-  <!-- SEARCH + FILTER -->
-
   <div class="dashboard-tools">
 
     <input
@@ -598,19 +684,101 @@ footer{
       onchange="loadDashboard()"
     >
 
-      <option value="All">
-        All Certificates
-      </option>
-
-      <option value="Valid">
-        Valid Only
-      </option>
-
-      <option value="Revoked">
-        Revoked Only
-      </option>
+      <option value="All">All Certificates</option>
+      <option value="Valid">Valid Only</option>
+      <option value="Revoked">Revoked Only</option>
 
     </select>
+
+  </div>
+
+
+  <!-- BRANDING -->
+
+  <div class="branding-box">
+
+    <h3>🏫 Institution Branding</h3>
+
+    <p class="small-note">
+      Customize the institution name and logo shown on certificates.
+      These settings are saved only in this browser.
+    </p>
+
+    <div class="admin-grid">
+
+      <div>
+
+        <label>
+          <strong>Institution Name</strong>
+        </label>
+
+        <input
+          type="text"
+          id="brandingName"
+          placeholder="e.g. Learn Afghan"
+        >
+
+      </div>
+
+      <div>
+
+        <label>
+          <strong>Logo URL</strong>
+        </label>
+
+        <input
+          type="url"
+          id="brandingLogo"
+          placeholder="https://example.com/logo.png"
+        >
+
+      </div>
+
+    </div>
+
+    <button
+      type="button"
+      class="btn-success"
+      onclick="saveBranding()"
+    >
+      💾 Save Branding
+    </button>
+
+    <button
+      type="button"
+      class="btn-secondary"
+      onclick="resetBranding()"
+    >
+      Reset
+    </button>
+
+    <div
+      id="brandingMessage"
+      class="message"
+    ></div>
+
+    <div class="branding-preview">
+
+      <img
+        id="brandingPreviewImage"
+        src=""
+        alt="Logo"
+        class="hidden"
+      >
+
+      <div>
+
+        <strong id="brandingPreviewName">
+          CertiChain
+        </strong>
+
+        <span class="small-note">
+          Certificate branding preview
+        </span>
+
+      </div>
+
+    </div>
 
   </div>
 
@@ -658,6 +826,7 @@ footer{
       >
 
       <button
+        type="button"
         class="btn-success"
         onclick="issueCertificate()"
       >
@@ -668,13 +837,10 @@ footer{
 
   </div>
 
-  <div
-    id="issueMessage"
-    class="message"
-  ></div>
+  <div id="issueMessage" class="message"></div>
 
 
-  <!-- DASHBOARD TABLE -->
+  <!-- TABLE -->
 
   <h3 style="margin-top:30px;">
     📜 Certificates
@@ -697,9 +863,7 @@ footer{
 
       </thead>
 
-      <tbody id="dashboardTable">
-
-      </tbody>
+      <tbody id="dashboardTable"></tbody>
 
     </table>
 
@@ -708,7 +872,7 @@ footer{
 </section>
 
 
-<!-- ================= PRICING ================= -->
+<!-- PRICING -->
 
 <section class="card">
 
@@ -717,7 +881,6 @@ footer{
   </h2>
 
   <div class="pricing">
-
 
     <div class="price-card">
 
@@ -737,6 +900,7 @@ footer{
       </ul>
 
       <button
+        type="button"
         onclick="openContact('Basic Plan')"
       >
         Contact Us
@@ -763,6 +927,7 @@ footer{
       </ul>
 
       <button
+        type="button"
         class="btn-gold"
         onclick="openContact('Professional Plan')"
       >
@@ -790,6 +955,7 @@ footer{
       </ul>
 
       <button
+        type="button"
         onclick="openContact('Institution Plan')"
       >
         Contact Us
@@ -802,7 +968,7 @@ footer{
 </section>
 
 
-<!-- ================= CONTACT ================= -->
+<!-- CONTACT -->
 
 <section
   id="contactSection"
@@ -839,6 +1005,7 @@ footer{
     ></textarea>
 
     <button
+      type="button"
       class="btn-success"
       onclick="sendContactEmail()"
     >
@@ -846,6 +1013,7 @@ footer{
     </button>
 
     <button
+      type="button"
       class="btn-secondary"
       onclick="closeContact()"
     >
@@ -868,7 +1036,9 @@ footer{
 <footer>
 
   <p>
-    © 2026 CertiChain — Digital Certificate Verification System
+    © 2026
+    <span id="footerBrandName">CertiChain</span>
+    — Digital Certificate Verification System
   </p>
 
   <p style="margin-top:7px;">
@@ -878,11 +1048,10 @@ footer{
 </footer>
 
 
-
 <script>
 
 /* =====================================================
-   SUPABASE CONFIGURATION
+   CONFIG
 ===================================================== */
 
 const SUPABASE_URL =
@@ -891,16 +1060,8 @@ const SUPABASE_URL =
 const SUPABASE_KEY =
   "sb_publishable_EP_DAGlDLkQHgWUqSNbNhA_6AGcdiYM";
 
-const supabaseClient =
-  supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-  );
-
-
-/* =====================================================
-   EMAILJS CONFIGURATION
-===================================================== */
+const EDGE_FUNCTION_NAME =
+  "Verify_Certificate-";
 
 const EMAILJS_PUBLIC_KEY =
   "43p_6GCnwnALQClfh";
@@ -912,21 +1073,155 @@ const EMAILJS_TEMPLATE_ID =
   "template_hc1o71q";
 
 
-emailjs.init({
-  publicKey: EMAILJS_PUBLIC_KEY
-});
-
-
 /* =====================================================
-   EDGE FUNCTION
+   CLIENT VARIABLES
 ===================================================== */
 
-const EDGE_FUNCTION_NAME =
-  "Verify_Certificate-";
+let supabaseClient = null;
+let emailReady = false;
 
 
 /* =====================================================
-   MESSAGE HELPER
+   BRANDING
+===================================================== */
+
+const DEFAULT_BRANDING = {
+  name:"CertiChain",
+  logo:""
+};
+
+const BRANDING_STORAGE_KEY =
+  "certichain_branding";
+
+
+/* =====================================================
+   INITIALIZE SERVICES
+===================================================== */
+
+function initializeServices(){
+
+  /* SUPABASE */
+
+  if(
+    typeof window.supabase !== "undefined"
+  ){
+
+    try{
+
+      supabaseClient =
+        window.supabase.createClient(
+          SUPABASE_URL,
+          SUPABASE_KEY
+        );
+
+    }
+    catch(error){
+
+      console.error(
+        "Supabase initialization error:",
+        error
+      );
+
+    }
+
+  }
+  else{
+
+    console.error(
+      "Supabase library was not loaded."
+    );
+
+  }
+
+
+  /* EMAILJS */
+
+  if(
+    typeof window.emailjs !== "undefined"
+  ){
+
+    try{
+
+      window.emailjs.init({
+        publicKey:
+          EMAILJS_PUBLIC_KEY
+      });
+
+      emailReady = true;
+
+    }
+    catch(error){
+
+      console.error(
+        "EmailJS initialization error:",
+        error
+      );
+
+    }
+
+  }
+  else{
+
+    console.error(
+      "EmailJS library was not loaded."
+    );
+
+  }
+
+
+  /* AUTH LISTENER */
+
+  if(supabaseClient){
+
+    supabaseClient.auth.onAuthStateChange(
+      function(event,session){
+
+        if(session){
+
+          showAdminDashboard();
+
+        }
+        else if(
+          event === "SIGNED_OUT"
+        ){
+
+          hideAdminDashboard();
+
+        }
+
+      }
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   CHECK SERVICES
+===================================================== */
+
+function checkSupabase(){
+
+  if(!supabaseClient){
+
+    showMessage(
+      "verifyMessage",
+      "Supabase could not be loaded. Please refresh the page and try again.",
+      "error"
+    );
+
+    return false;
+
+  }
+
+  return true;
+
+}
+
+
+/* =====================================================
+   MESSAGE
 ===================================================== */
 
 function showMessage(
@@ -936,12 +1231,257 @@ function showMessage(
 ){
 
   const element =
-    document.getElementById(elementId);
+    document.getElementById(
+      elementId
+    );
+
+  if(!element){
+    return;
+  }
 
   element.textContent = text;
 
   element.className =
     "message " + type;
+
+}
+
+
+/* =====================================================
+   BRANDING GET
+===================================================== */
+
+function getBranding(){
+
+  try{
+
+    const saved =
+      localStorage.getItem(
+        BRANDING_STORAGE_KEY
+      );
+
+    if(!saved){
+
+      return {
+        ...DEFAULT_BRANDING
+      };
+
+    }
+
+    const parsed =
+      JSON.parse(saved);
+
+    return {
+
+      name:
+        parsed.name ||
+        DEFAULT_BRANDING.name,
+
+      logo:
+        parsed.logo ||
+        DEFAULT_BRANDING.logo
+
+    };
+
+  }
+  catch(error){
+
+    console.error(error);
+
+    return {
+      ...DEFAULT_BRANDING
+    };
+
+  }
+
+}
+
+
+/* =====================================================
+   APPLY BRANDING
+===================================================== */
+
+function applyBranding(){
+
+  const branding =
+    getBranding();
+
+  const header =
+    document.getElementById(
+      "headerBrandName"
+    );
+
+  const footer =
+    document.getElementById(
+      "footerBrandName"
+    );
+
+  const nameInput =
+    document.getElementById(
+      "brandingName"
+    );
+
+  const logoInput =
+    document.getElementById(
+      "brandingLogo"
+    );
+
+  const previewName =
+    document.getElementById(
+      "brandingPreviewName"
+    );
+
+  const previewImage =
+    document.getElementById(
+      "brandingPreviewImage"
+    );
+
+
+  if(header){
+    header.textContent =
+      branding.name;
+  }
+
+  if(footer){
+    footer.textContent =
+      branding.name;
+  }
+
+  if(nameInput){
+    nameInput.value =
+      branding.name;
+  }
+
+  if(logoInput){
+    logoInput.value =
+      branding.logo;
+  }
+
+  if(previewName){
+    previewName.textContent =
+      branding.name;
+  }
+
+  if(previewImage){
+
+    if(branding.logo){
+
+      previewImage.src =
+        branding.logo;
+
+      previewImage.classList.remove(
+        "hidden"
+      );
+
+    }
+    else{
+
+      previewImage.removeAttribute(
+        "src"
+      );
+
+      previewImage.classList.add(
+        "hidden"
+      );
+
+    }
+
+  }
+
+}
+
+
+/* =====================================================
+   SAVE BRANDING
+===================================================== */
+
+function saveBranding(){
+
+  const nameElement =
+    document.getElementById(
+      "brandingName"
+    );
+
+  const logoElement =
+    document.getElementById(
+      "brandingLogo"
+    );
+
+  if(!nameElement || !logoElement){
+    return;
+  }
+
+  const name =
+    nameElement.value.trim();
+
+  const logo =
+    logoElement.value.trim();
+
+  try{
+
+    localStorage.setItem(
+      BRANDING_STORAGE_KEY,
+      JSON.stringify({
+
+        name:
+          name || "CertiChain",
+
+        logo:
+          logo
+
+      })
+    );
+
+    applyBranding();
+
+    showMessage(
+      "brandingMessage",
+      "Institution branding saved successfully.",
+      "success"
+    );
+
+  }
+  catch(error){
+
+    console.error(error);
+
+    showMessage(
+      "brandingMessage",
+      "Could not save branding.",
+      "error"
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   RESET BRANDING
+===================================================== */
+
+function resetBranding(){
+
+  try{
+
+    localStorage.removeItem(
+      BRANDING_STORAGE_KEY
+    );
+
+    applyBranding();
+
+    showMessage(
+      "brandingMessage",
+      "Branding reset successfully.",
+      "success"
+    );
+
+  }
+  catch(error){
+
+    console.error(error);
+
+  }
 
 }
 
@@ -954,12 +1494,19 @@ async function verifyCertificate(
   certificateIdFromURL = null
 ){
 
+  if(!checkSupabase()){
+    return;
+  }
+
   const input =
-    document.getElementById("certificateId");
+    document.getElementById(
+      "certificateId"
+    );
 
   const certificateId =
     certificateIdFromURL ||
-    input.value.trim();
+    (input ? input.value.trim() : "");
+
 
   if(!certificateId){
 
@@ -970,13 +1517,14 @@ async function verifyCertificate(
     );
 
     return;
+
   }
 
 
   showMessage(
     "verifyMessage",
     "Verifying certificate...",
-    "success"
+    "info"
   );
 
 
@@ -991,7 +1539,9 @@ async function verifyCertificate(
     );
 
 
-  section.classList.remove("hidden");
+  section.classList.remove(
+    "hidden"
+  );
 
   result.innerHTML =
     "<p>Checking certificate...</p>";
@@ -1039,17 +1589,9 @@ async function verifyCertificate(
     }
 
 
-    const cert =
-      data.certificate;
-
-
-    const hash =
-      data.hash || "";
-
-
     displayCertificate(
-      cert,
-      hash
+      data.certificate,
+      data.hash || ""
     );
 
 
@@ -1060,15 +1602,17 @@ async function verifyCertificate(
     );
 
   }
-
   catch(error){
 
-    console.error(error);
+    console.error(
+      "Verification error:",
+      error
+    );
 
     result.innerHTML = `
       <div class="message error">
         Unable to verify certificate.
-        Please try again.
+        Please check the Certificate ID and try again.
       </div>
     `;
 
@@ -1097,15 +1641,39 @@ function displayCertificate(
       "certificateResult"
     );
 
+  const branding =
+    getBranding();
 
   const status =
     cert.status || "Valid";
-
 
   const statusClass =
     status === "Valid"
       ? "status-valid"
       : "status-revoked";
+
+
+  let logoHTML = "";
+
+  if(branding.logo){
+
+    logoHTML = `
+      <img
+        src="${escapeHTML(branding.logo)}"
+        class="brand-logo"
+        alt="Institution Logo"
+        onerror="this.style.display='none'"
+      >
+    `;
+
+  }
+  else{
+
+    logoHTML = `
+      <div class="award">🏆</div>
+    `;
+
+  }
 
 
   result.innerHTML = `
@@ -1115,106 +1683,130 @@ function displayCertificate(
       class="certificate"
     >
 
-      <div class="award">
-        🏆
-      </div>
+      <div class="certificate-inner">
 
-      <h1>
-        CERTIFICATE OF ACHIEVEMENT
-      </h1>
+        ${logoHTML}
 
-      <p>
-        This certificate is proudly presented to
-      </p>
+        <div class="brand-name">
+          ${escapeHTML(branding.name)}
+        </div>
 
-      <div class="student-name">
-        ${escapeHTML(cert.student_name)}
-      </div>
+        <h1>
+          CERTIFICATE OF ACHIEVEMENT
+        </h1>
 
-      <p>
-        for successfully completing
-      </p>
-
-      <h3 style="margin:15px 0;">
-        ${escapeHTML(cert.course_name)}
-      </h3>
-
-      <div class="cert-line">
-        <strong>Certificate ID:</strong>
-        ${escapeHTML(cert.certificate_id)}
-      </div>
-
-      <div class="cert-line">
-        <strong>Issue Date:</strong>
-        ${escapeHTML(cert.issue_date)}
-      </div>
-
-      <div class="cert-line">
-        <strong>Issued By:</strong>
-        ${escapeHTML(cert.issued_by || "CertiChain")}
-      </div>
-
-      <div class="status ${statusClass}">
-        ${escapeHTML(status)}
-      </div>
-
-      <div id="qrcode"></div>
-
-      ${
-        hash
-        ?
-        `
-        <p style="margin-top:15px;">
-          <strong>Verification Hash</strong>
+        <p>
+          This certificate is proudly presented to
         </p>
 
-        <div class="hash">
-          ${escapeHTML(hash)}
+        <div class="student-name">
+          ${escapeHTML(cert.student_name)}
         </div>
-        `
-        :
-        ""
-      }
+
+        <p>
+          for successfully completing
+        </p>
+
+        <h3 style="margin:15px 0;">
+          ${escapeHTML(cert.course_name)}
+        </h3>
+
+        <div class="cert-line">
+          <strong>Certificate ID:</strong>
+          ${escapeHTML(cert.certificate_id)}
+        </div>
+
+        <div class="cert-line">
+          <strong>Issue Date:</strong>
+          ${escapeHTML(cert.issue_date)}
+        </div>
+
+        <div class="cert-line">
+          <strong>Issued By:</strong>
+          ${escapeHTML(
+            cert.issued_by ||
+            branding.name ||
+            "CertiChain"
+          )}
+        </div>
+
+        <div class="status ${statusClass}">
+          ${escapeHTML(status)}
+        </div>
+
+        <div id="qrcode"></div>
+
+        ${
+          hash
+          ?
+          `
+          <p style="margin-top:15px;">
+            <strong>Verification Hash</strong>
+          </p>
+
+          <div class="hash">
+            ${escapeHTML(hash)}
+          </div>
+          `
+          :
+          ""
+        }
+
+      </div>
 
     </div>
 
     <div style="text-align:center;margin-top:15px;">
 
       <button
+        type="button"
         onclick="printCertificate()"
       >
         🖨 Print / Save
       </button>
 
     </div>
+
   `;
 
 
-  /* QR CODE */
+  /* QR */
 
-  const verifyURL =
-    window.location.origin +
-    window.location.pathname +
-    "?id=" +
-    encodeURIComponent(
-      cert.certificate_id
+  const qrElement =
+    document.getElementById(
+      "qrcode"
     );
 
 
-  new QRCode(
-    document.getElementById("qrcode"),
-    {
-      text:verifyURL,
-      width:150,
-      height:150
-    }
-  );
+  if(
+    qrElement &&
+    typeof window.QRCode !== "undefined"
+  ){
+
+    const verifyURL =
+      window.location.origin +
+      window.location.pathname +
+      "?id=" +
+      encodeURIComponent(
+        cert.certificate_id
+      );
+
+    new window.QRCode(
+      qrElement,
+      {
+        text:verifyURL,
+        width:150,
+        height:150
+      }
+    );
+
+  }
 
 }
 
 
 /* =====================================================
-   PRINT CERTIFICATE
+   PRINT
 ===================================================== */
 
 function printCertificate(){
@@ -1223,7 +1815,6 @@ function printCertificate(){
     document.getElementById(
       "printCertificate"
     );
-
 
   if(!certificate){
 
@@ -1243,29 +1834,111 @@ function printCertificate(){
     );
 
 
+  if(!printWindow){
+
+    alert(
+      "Please allow pop-ups to print the certificate."
+    );
+
+    return;
+
+  }
+
+
   printWindow.document.write(`
+
+    <!DOCTYPE html>
 
     <html>
 
     <head>
 
-      <title>CertiChain Certificate</title>
+      <title>Certificate</title>
+
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+      >
 
       <style>
 
         body{
-          font-family:Arial;
+          font-family:Arial,sans-serif;
           padding:30px;
+          background:white;
         }
 
         .certificate{
           border:8px double #174f82;
           padding:40px;
           text-align:center;
+          color:#17263a;
+          position:relative;
+        }
+
+        .certificate:before{
+          content:"";
+          position:absolute;
+          inset:8px;
+          border:1px solid #c28a16;
+        }
+
+        .certificate-inner{
+          position:relative;
+          z-index:1;
+        }
+
+        .brand-logo{
+          width:90px;
+          height:90px;
+          object-fit:contain;
+        }
+
+        .brand-name{
+          color:#174f82;
+          font-size:18px;
+          font-weight:bold;
+          margin:10px;
         }
 
         h1{
           color:#174f82;
+        }
+
+        .student-name{
+          font-size:30px;
+          font-weight:bold;
+          margin:15px;
+        }
+
+        .status{
+          display:inline-block;
+          padding:7px 14px;
+          border-radius:20px;
+          margin:10px;
+        }
+
+        .status-valid{
+          background:#d9f7e5;
+          color:#08743d;
+        }
+
+        .status-revoked{
+          background:#ffe0e0;
+          color:#a60000;
+        }
+
+        #qrcode{
+          margin:20px auto;
+          display:flex;
+          justify-content:center;
+        }
+
+        .hash{
+          word-break:break-all;
+          background:#f0f4f8;
+          padding:10px;
+          font-size:12px;
         }
 
       </style>
@@ -1282,7 +1955,6 @@ function printCertificate(){
 
   `);
 
-
   printWindow.document.close();
 
   printWindow.focus();
@@ -1293,28 +1965,38 @@ function printCertificate(){
       printWindow.print();
 
     },
-    500
+    700
   );
 
 }
 
 
 /* =====================================================
-   ADMIN LOGIN
+   LOGIN
 ===================================================== */
 
 async function adminLogin(){
 
-  const email =
-    document.getElementById(
-      "adminEmail"
-    ).value.trim();
+  if(!checkSupabase()){
+    showMessage(
+      "loginMessage",
+      "Supabase is not loaded. Refresh the page and try again.",
+      "error"
+    );
+    return;
+  }
 
+
+  const email =
+    document
+      .getElementById("adminEmail")
+      .value
+      .trim();
 
   const password =
-    document.getElementById(
-      "adminPassword"
-    ).value;
+    document
+      .getElementById("adminPassword")
+      .value;
 
 
   if(!email || !password){
@@ -1333,52 +2015,58 @@ async function adminLogin(){
   showMessage(
     "loginMessage",
     "Logging in...",
-    "success"
+    "info"
   );
 
 
-  const {
-    data,
-    error
-  } =
-    await supabaseClient.auth.signInWithPassword({
-      email:email,
-      password:password
-    });
+  try{
+
+    const result =
+      await supabaseClient.auth.signInWithPassword({
+
+        email:email,
+        password:password
+
+      });
 
 
-  if(error){
+    if(result.error){
+
+      showMessage(
+        "loginMessage",
+        result.error.message,
+        "error"
+      );
+
+      return;
+
+    }
+
+
+    if(result.data.session){
+
+      showAdminDashboard();
+
+      document
+        .getElementById(
+          "adminPassword"
+        )
+        .value = "";
+
+      await loadDashboard();
+
+    }
+
+  }
+  catch(error){
 
     console.error(error);
 
     showMessage(
       "loginMessage",
-      error.message,
+      "Login failed. Please try again.",
       "error"
     );
-
-    return;
-
-  }
-
-
-  if(data.session){
-
-    document
-      .getElementById("loginSection")
-      .classList.add("hidden");
-
-    document
-      .getElementById("dashboardSection")
-      .classList.remove("hidden");
-
-
-    document
-      .getElementById("adminPassword")
-      .value = "";
-
-
-    loadDashboard();
 
   }
 
@@ -1386,79 +2074,120 @@ async function adminLogin(){
 
 
 /* =====================================================
-   ADMIN LOGOUT
+   SHOW / HIDE DASHBOARD
+===================================================== */
+
+function showAdminDashboard(){
+
+  document
+    .getElementById(
+      "loginSection"
+    )
+    .classList.add(
+      "hidden"
+    );
+
+  document
+    .getElementById(
+      "dashboardSection"
+    )
+    .classList.remove(
+      "hidden"
+    );
+
+}
+
+
+function hideAdminDashboard(){
+
+  document
+    .getElementById(
+      "dashboardSection"
+    )
+    .classList.add(
+      "hidden"
+    );
+
+  document
+    .getElementById(
+      "loginSection"
+    )
+    .classList.remove(
+      "hidden"
+    );
+
+}
+
+
+/* =====================================================
+   LOGOUT
 ===================================================== */
 
 async function adminLogout(){
 
-  await supabaseClient.auth.signOut();
+  if(supabaseClient){
 
+    try{
 
-  document
-    .getElementById("dashboardSection")
-    .classList.add("hidden");
+      await supabaseClient.auth.signOut();
 
+    }
+    catch(error){
 
-  document
-    .getElementById("loginSection")
-    .classList.remove("hidden");
-
-}
-
-
-/* =====================================================
-   CHECK CURRENT SESSION
-===================================================== */
-
-async function checkSession(){
-
-  const {
-    data
-  } =
-    await supabaseClient.auth.getSession();
-
-
-  if(data.session){
-
-    document
-      .getElementById("loginSection")
-      .classList.add("hidden");
-
-
-    document
-      .getElementById("dashboardSection")
-      .classList.remove("hidden");
-
-
-    loadDashboard();
-
-  }
-
-}
-
-
-/* =====================================================
-   AUTH STATE CHANGE
-===================================================== */
-
-supabaseClient.auth.onAuthStateChange(
-  function(event, session){
-
-    if(session){
-
-      document
-        .getElementById("loginSection")
-        .classList.add("hidden");
-
-
-      document
-        .getElementById("dashboardSection")
-        .classList.remove("hidden");
+      console.error(error);
 
     }
 
   }
-);
+
+  hideAdminDashboard();
+
+  showMessage(
+    "loginMessage",
+    "You have been logged out.",
+    "success"
+  );
+
+}
+
+
+/* =====================================================
+   SESSION
+===================================================== */
+
+async function checkSession(){
+
+  if(!supabaseClient){
+    return;
+  }
+
+  try{
+
+    const result =
+      await supabaseClient.auth.getSession();
+
+    if(
+      result.data &&
+      result.data.session
+    ){
+
+      showAdminDashboard();
+
+      await loadDashboard();
+
+    }
+
+  }
+  catch(error){
+
+    console.error(
+      "Session error:",
+      error
+    );
+
+  }
+
+}
 
 
 /* =====================================================
@@ -1467,17 +2196,32 @@ supabaseClient.auth.onAuthStateChange(
 
 async function loadDashboard(){
 
-  const search =
-    document
-      .getElementById("dashboardSearch")
-      .value
-      .trim();
+  if(!supabaseClient){
+    return;
+  }
 
+
+  const searchInput =
+    document.getElementById(
+      "dashboardSearch"
+    );
+
+  const statusInput =
+    document.getElementById(
+      "dashboardStatus"
+    );
+
+
+  if(!searchInput || !statusInput){
+    return;
+  }
+
+
+  const search =
+    searchInput.value.trim();
 
   const selectedStatus =
-    document
-      .getElementById("dashboardStatus")
-      .value;
+    statusInput.value;
 
 
   let query =
@@ -1506,9 +2250,7 @@ async function loadDashboard(){
   }
 
 
-  if(
-    selectedStatus !== "All"
-  ){
+  if(selectedStatus !== "All"){
 
     query =
       query.eq(
@@ -1519,25 +2261,34 @@ async function loadDashboard(){
   }
 
 
-  const {
-    data,
-    error
-  } =
-    await query;
+  try{
+
+    const result =
+      await query;
 
 
-  if(error){
+    if(result.error){
+
+      console.error(
+        "Dashboard error:",
+        result.error
+      );
+
+      return;
+
+    }
+
+
+    renderDashboard(
+      result.data || []
+    );
+
+  }
+  catch(error){
 
     console.error(error);
 
-    return;
-
   }
-
-
-  renderDashboard(
-    data || []
-  );
 
 }
 
@@ -1556,85 +2307,123 @@ function renderDashboard(
     );
 
 
+  if(!table){
+    return;
+  }
+
+
   table.innerHTML = "";
 
 
-  certificates.forEach(
-    function(cert){
+  if(
+    !certificates ||
+    certificates.length === 0
+  ){
 
-      const row =
-        document.createElement("tr");
+    table.innerHTML = `
 
+      <tr>
 
-      const statusClass =
-        cert.status === "Valid"
-          ? "badge-valid"
-          : "badge-revoked";
-
-
-      row.innerHTML = `
-
-        <td>
-          ${escapeHTML(cert.certificate_id)}
+        <td
+          colspan="6"
+          style="text-align:center;color:#64748b;"
+        >
+          No certificates found.
         </td>
 
-        <td>
-          ${escapeHTML(cert.student_name)}
-        </td>
+      </tr>
 
-        <td>
-          ${escapeHTML(cert.course_name)}
-        </td>
+    `;
 
-        <td>
-          ${escapeHTML(cert.issue_date)}
-        </td>
+  }
+  else{
 
-        <td>
+    certificates.forEach(
+      function(cert){
 
-          <span
-            class="badge ${statusClass}"
-          >
-            ${escapeHTML(cert.status)}
-          </span>
+        const row =
+          document.createElement(
+            "tr"
+          );
 
-        </td>
 
-        <td>
+        const statusClass =
+          cert.status === "Valid"
+            ? "badge-valid"
+            : "badge-revoked";
 
-          <button
-            onclick="viewDashboardCertificate('${encodeURIComponent(cert.certificate_id)}')"
-          >
-            View
-          </button>
 
-          ${
-            cert.status === "Valid"
-            ?
-            `
-            <button
-              class="btn-danger"
-              onclick="revokeCertificate('${encodeURIComponent(cert.certificate_id)}')"
+        const id =
+          encodeURIComponent(
+            cert.certificate_id
+          );
+
+
+        row.innerHTML = `
+
+          <td>
+            ${escapeHTML(cert.certificate_id)}
+          </td>
+
+          <td>
+            ${escapeHTML(cert.student_name)}
+          </td>
+
+          <td>
+            ${escapeHTML(cert.course_name)}
+          </td>
+
+          <td>
+            ${escapeHTML(cert.issue_date)}
+          </td>
+
+          <td>
+
+            <span
+              class="badge ${statusClass}"
             >
-              Revoke
+              ${escapeHTML(cert.status)}
+            </span>
+
+          </td>
+
+          <td>
+
+            <button
+              type="button"
+              onclick="viewDashboardCertificate('${id}')"
+            >
+              View
             </button>
-            `
-            :
-            ""
-          }
 
-        </td>
+            ${
+              cert.status === "Valid"
+              ?
+              `
+              <button
+                type="button"
+                class="btn-danger"
+                onclick="revokeCertificate('${id}')"
+              >
+                Revoke
+              </button>
+              `
+              :
+              ""
+            }
 
-      `;
+          </td>
+
+        `;
 
 
-      table.appendChild(row);
+        table.appendChild(row);
 
-    }
-  );
+      }
+    );
 
+  }
 
-  /* STATS */
 
   loadStats();
 
@@ -1642,72 +2431,89 @@ function renderDashboard(
 
 
 /* =====================================================
-   LOAD STATS
+   STATS
 ===================================================== */
 
 async function loadStats(){
 
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
-      .from("certificates")
-      .select("status");
-
-
-  if(error){
-
-    console.error(error);
-
+  if(!supabaseClient){
     return;
-
   }
 
 
-  const total =
-    data.length;
+  try{
+
+    const result =
+      await supabaseClient
+        .from("certificates")
+        .select("status");
 
 
-  const valid =
-    data.filter(
-      item =>
-        item.status === "Valid"
-    ).length;
+    if(result.error){
+
+      console.error(
+        "Stats error:",
+        result.error
+      );
+
+      return;
+
+    }
 
 
-  const revoked =
-    data.filter(
-      item =>
-        item.status === "Revoked"
-    ).length;
+    const certificates =
+      result.data || [];
 
 
-  document
-    .getElementById(
-      "totalCertificates"
-    )
-    .textContent = total;
+    const total =
+      certificates.length;
+
+    const valid =
+      certificates.filter(
+        item =>
+          item.status === "Valid"
+      ).length;
+
+    const revoked =
+      certificates.filter(
+        item =>
+          item.status === "Revoked"
+      ).length;
 
 
-  document
-    .getElementById(
-      "validCertificates"
-    )
-    .textContent = valid;
+    document
+      .getElementById(
+        "totalCertificates"
+      )
+      .textContent =
+        total;
 
+    document
+      .getElementById(
+        "validCertificates"
+      )
+      .textContent =
+        valid;
 
-  document
-    .getElementById(
-      "revokedCertificates"
-    )
-    .textContent = revoked;
+    document
+      .getElementById(
+        "revokedCertificates"
+      )
+      .textContent =
+        revoked;
+
+  }
+  catch(error){
+
+    console.error(error);
+
+  }
 
 }
 
 
 /* =====================================================
-   VIEW DASHBOARD CERTIFICATE
+   VIEW CERTIFICATE
 ===================================================== */
 
 async function viewDashboardCertificate(
@@ -1724,7 +2530,8 @@ async function viewDashboardCertificate(
     .getElementById(
       "certificateId"
     )
-    .value = id;
+    .value =
+      id;
 
 
   await verifyCertificate(id);
@@ -1739,41 +2546,52 @@ async function viewDashboardCertificate(
 
 
 /* =====================================================
-   ISSUE NEW CERTIFICATE
+   ISSUE CERTIFICATE
 ===================================================== */
 
 async function issueCertificate(){
 
+  if(!checkSupabase()){
+    return;
+  }
+
+
   const certificateId =
     document
-      .getElementById("newCertificateId")
+      .getElementById(
+        "newCertificateId"
+      )
       .value
       .trim();
-
 
   const studentName =
     document
-      .getElementById("newStudentName")
+      .getElementById(
+        "newStudentName"
+      )
       .value
       .trim();
-
 
   const courseName =
     document
-      .getElementById("newCourseName")
+      .getElementById(
+        "newCourseName"
+      )
       .value
       .trim();
 
-
   const issueDate =
     document
-      .getElementById("newIssueDate")
+      .getElementById(
+        "newIssueDate"
+      )
       .value;
-
 
   const issuedBy =
     document
-      .getElementById("newIssuedBy")
+      .getElementById(
+        "newIssuedBy"
+      )
       .value
       .trim() ||
     "CertiChain";
@@ -1797,96 +2615,121 @@ async function issueCertificate(){
   }
 
 
-  const {
-    error
-  } =
-    await supabaseClient
-      .from("certificates")
-      .insert({
-
-        certificate_id:
-          certificateId,
-
-        student_name:
-          studentName,
-
-        course_name:
-          courseName,
-
-        issue_date:
-          issueDate,
-
-        issued_by:
-          issuedBy,
-
-        status:
-          "Valid"
-
-      });
+  showMessage(
+    "issueMessage",
+    "Creating certificate...",
+    "info"
+  );
 
 
-  if(error){
+  try{
+
+    const result =
+      await supabaseClient
+        .from("certificates")
+        .insert({
+
+          certificate_id:
+            certificateId,
+
+          student_name:
+            studentName,
+
+          course_name:
+            courseName,
+
+          issue_date:
+            issueDate,
+
+          issued_by:
+            issuedBy,
+
+          status:
+            "Valid"
+
+        });
+
+
+    if(result.error){
+
+      console.error(
+        "Issue error:",
+        result.error
+      );
+
+      showMessage(
+        "issueMessage",
+        result.error.message,
+        "error"
+      );
+
+      return;
+
+    }
+
+
+    showMessage(
+      "issueMessage",
+      "Certificate issued successfully!",
+      "success"
+    );
+
+
+    document
+      .getElementById(
+        "newCertificateId"
+      )
+      .value = "";
+
+    document
+      .getElementById(
+        "newStudentName"
+      )
+      .value = "";
+
+    document
+      .getElementById(
+        "newCourseName"
+      )
+      .value = "";
+
+    document
+      .getElementById(
+        "newIssueDate"
+      )
+      .value = "";
+
+
+    await loadDashboard();
+
+  }
+  catch(error){
 
     console.error(error);
 
     showMessage(
       "issueMessage",
-      error.message,
+      "Unable to issue certificate.",
       "error"
     );
 
-    return;
-
   }
-
-
-  showMessage(
-    "issueMessage",
-    "Certificate issued successfully!",
-    "success"
-  );
-
-
-  document
-    .getElementById(
-      "newCertificateId"
-    )
-    .value = "";
-
-
-  document
-    .getElementById(
-      "newStudentName"
-    )
-    .value = "";
-
-
-  document
-    .getElementById(
-      "newCourseName"
-    )
-    .value = "";
-
-
-  document
-    .getElementById(
-      "newIssueDate"
-    )
-    .value = "";
-
-
-  loadDashboard();
 
 }
 
 
 /* =====================================================
-   REVOKE CERTIFICATE
+   REVOKE
 ===================================================== */
 
 async function revokeCertificate(
   encodedId
 ){
+
+  if(!checkSupabase()){
+    return;
+  }
+
 
   const certificateId =
     decodeURIComponent(
@@ -1901,27 +2744,49 @@ async function revokeCertificate(
 
 
   if(!confirmed){
-
     return;
-
   }
 
 
-  const {
-    error
-  } =
-    await supabaseClient
-      .from("certificates")
-      .update({
-        status:"Revoked"
-      })
-      .eq(
-        "certificate_id",
-        certificateId
+  try{
+
+    const result =
+      await supabaseClient
+        .from("certificates")
+        .update({
+          status:"Revoked"
+        })
+        .eq(
+          "certificate_id",
+          certificateId
+        );
+
+
+    if(result.error){
+
+      console.error(
+        "Revoke error:",
+        result.error
       );
 
+      alert(
+        result.error.message
+      );
 
-  if(error){
+      return;
+
+    }
+
+
+    alert(
+      "Certificate revoked successfully."
+    );
+
+
+    await loadDashboard();
+
+  }
+  catch(error){
 
     console.error(error);
 
@@ -1929,49 +2794,40 @@ async function revokeCertificate(
       "Unable to revoke certificate."
     );
 
-    return;
-
   }
-
-
-  alert(
-    "Certificate revoked successfully."
-  );
-
-
-  loadDashboard();
 
 }
 
 
 /* =====================================================
-   CONTACT FORM
+   CONTACT
 ===================================================== */
 
 function openContact(plan){
 
-  document
-    .getElementById(
+  const section =
+    document.getElementById(
       "contactSection"
-    )
-    .classList.remove("hidden");
+    );
 
-
-  document
-    .getElementById(
+  const title =
+    document.getElementById(
       "contactTitle"
-    )
-    .value =
-      "Inquiry about " + plan;
+    );
 
 
-  document
-    .getElementById(
-      "contactSection"
-    )
-    .scrollIntoView({
-      behavior:"smooth"
-    });
+  section.classList.remove(
+    "hidden"
+  );
+
+
+  title.value =
+    "Inquiry about " + plan;
+
+
+  section.scrollIntoView({
+    behavior:"smooth"
+  });
 
 }
 
@@ -1982,41 +2838,48 @@ function closeContact(){
     .getElementById(
       "contactSection"
     )
-    .classList.add("hidden");
+    .classList.add(
+      "hidden"
+    );
 
 }
 
 
 /* =====================================================
-   SEND EMAIL WITH EMAILJS
+   SEND EMAIL
 ===================================================== */
 
 async function sendContactEmail(){
 
   const name =
     document
-      .getElementById("contactName")
+      .getElementById(
+        "contactName"
+      )
       .value
       .trim();
-
 
   const email =
     document
-      .getElementById("contactEmail")
+      .getElementById(
+        "contactEmail"
+      )
       .value
       .trim();
-
 
   const title =
     document
-      .getElementById("contactTitle")
+      .getElementById(
+        "contactTitle"
+      )
       .value
       .trim();
 
-
   const message =
     document
-      .getElementById("contactMessage")
+      .getElementById(
+        "contactMessage"
+      )
       .value
       .trim();
 
@@ -2039,25 +2902,49 @@ async function sendContactEmail(){
   }
 
 
+  if(!emailReady){
+
+    showMessage(
+      "contactMessageBox",
+      "Email service is not loaded. Please refresh the page.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
   showMessage(
     "contactMessageBox",
     "Sending your message...",
-    "success"
+    "info"
   );
 
 
   try{
 
-    await emailjs.send(
+    await window.emailjs.send(
+
       EMAILJS_SERVICE_ID,
+
       EMAILJS_TEMPLATE_ID,
+
       {
+
         name:name,
+
         email:email,
+
         title:title,
+
         message:message,
-        time:new Date().toLocaleString()
+
+        time:
+          new Date().toLocaleString()
+
       }
+
     );
 
 
@@ -2069,29 +2956,36 @@ async function sendContactEmail(){
 
 
     document
-      .getElementById("contactName")
+      .getElementById(
+        "contactName"
+      )
       .value = "";
 
-
     document
-      .getElementById("contactEmail")
+      .getElementById(
+        "contactEmail"
+      )
       .value = "";
 
-
     document
-      .getElementById("contactTitle")
+      .getElementById(
+        "contactTitle"
+      )
       .value = "";
 
-
     document
-      .getElementById("contactMessage")
+      .getElementById(
+        "contactMessage"
+      )
       .value = "";
 
   }
-
   catch(error){
 
-    console.error(error);
+    console.error(
+      "EmailJS error:",
+      error
+    );
 
     showMessage(
       "contactMessageBox",
@@ -2110,8 +3004,10 @@ async function sendContactEmail(){
 
 function escapeHTML(value){
 
-  if(value === null ||
-     value === undefined){
+  if(
+    value === null ||
+    value === undefined
+  ){
 
     return "";
 
@@ -2119,31 +3015,52 @@ function escapeHTML(value){
 
 
   return String(value)
+
     .replace(/&/g,"&amp;")
+
     .replace(/</g,"&lt;")
+
     .replace(/>/g,"&gt;")
+
     .replace(/"/g,"&quot;")
+
     .replace(/'/g,"&#039;");
 
 }
 
 
 /* =====================================================
-   URL CERTIFICATE AUTO VERIFICATION
+   START
 ===================================================== */
 
 window.addEventListener(
   "DOMContentLoaded",
   async function(){
 
+    /* Branding */
+
+    applyBranding();
+
+
+    /*
+      Because the external libraries use defer,
+      they should now be available.
+    */
+
+    initializeServices();
+
+
+    /* Session */
+
     await checkSession();
 
+
+    /* URL certificate */
 
     const params =
       new URLSearchParams(
         window.location.search
       );
-
 
     const id =
       params.get("id");
@@ -2151,22 +3068,40 @@ window.addEventListener(
 
     if(id){
 
-      document
-        .getElementById(
+      const input =
+        document.getElementById(
           "certificateId"
-        )
-        .value = id;
+        );
 
+      if(input){
+        input.value = id;
+      }
 
-      verifyCertificate(id);
+      await verifyCertificate(id);
 
     }
 
   }
 );
 
-</script>
 
+/* =====================================================
+   GLOBAL ERROR HANDLER
+===================================================== */
+
+window.addEventListener(
+  "error",
+  function(event){
+
+    console.error(
+      "Global JavaScript error:",
+      event.error || event.message
+    );
+
+  }
+);
+
+</script>
 
 </body>
 
