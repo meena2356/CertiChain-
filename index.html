@@ -12,23 +12,18 @@
 
 <title>CertiChain — Digital Certificate Verification</title>
 
+
 <!-- QR CODE -->
-<script
-  src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"
-  defer>
-</script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
 
 <!-- SUPABASE -->
-<script
-  src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
-  defer>
-</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 
 <!-- EMAILJS -->
-<script
-  src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"
-  defer>
-</script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
 
 <style>
 
@@ -514,7 +509,9 @@ footer{
 
 </head>
 
+
 <body>
+
 
 <header>
 
@@ -551,7 +548,10 @@ footer{
       placeholder="Enter Certificate ID e.g. CERT-001"
     >
 
-    <button type="button" onclick="verifyCertificate()">
+    <button
+      type="button"
+      id="verifyButton"
+    >
       Verify
     </button>
 
@@ -604,7 +604,7 @@ footer{
 
   <button
     type="button"
-    onclick="adminLogin()"
+    id="loginButton"
   >
     Login
   </button>
@@ -642,7 +642,7 @@ footer{
     <button
       type="button"
       class="btn-secondary"
-      onclick="adminLogout()"
+      id="logoutButton"
     >
       Logout
     </button>
@@ -676,13 +676,9 @@ footer{
       type="text"
       id="dashboardSearch"
       placeholder="Search certificate ID or student name..."
-      oninput="loadDashboard()"
     >
 
-    <select
-      id="dashboardStatus"
-      onchange="loadDashboard()"
-    >
+    <select id="dashboardStatus">
 
       <option value="All">All Certificates</option>
       <option value="Valid">Valid Only</option>
@@ -739,7 +735,7 @@ footer{
     <button
       type="button"
       class="btn-success"
-      onclick="saveBranding()"
+      id="saveBrandingButton"
     >
       💾 Save Branding
     </button>
@@ -747,7 +743,7 @@ footer{
     <button
       type="button"
       class="btn-secondary"
-      onclick="resetBranding()"
+      id="resetBrandingButton"
     >
       Reset
     </button>
@@ -828,7 +824,7 @@ footer{
       <button
         type="button"
         class="btn-success"
-        onclick="issueCertificate()"
+        id="issueButton"
       >
         Issue Certificate
       </button>
@@ -901,7 +897,8 @@ footer{
 
       <button
         type="button"
-        onclick="openContact('Basic Plan')"
+        class="contactPlanButton"
+        data-plan="Basic Plan"
       >
         Contact Us
       </button>
@@ -928,8 +925,8 @@ footer{
 
       <button
         type="button"
-        class="btn-gold"
-        onclick="openContact('Professional Plan')"
+        class="btn-gold contactPlanButton"
+        data-plan="Professional Plan"
       >
         Contact Us
       </button>
@@ -956,7 +953,8 @@ footer{
 
       <button
         type="button"
-        onclick="openContact('Institution Plan')"
+        class="contactPlanButton"
+        data-plan="Institution Plan"
       >
         Contact Us
       </button>
@@ -1007,7 +1005,7 @@ footer{
     <button
       type="button"
       class="btn-success"
-      onclick="sendContactEmail()"
+      id="sendContactButton"
     >
       Send Message
     </button>
@@ -1015,7 +1013,7 @@ footer{
     <button
       type="button"
       class="btn-secondary"
-      onclick="closeContact()"
+      id="closeContactButton"
     >
       Cancel
     </button>
@@ -1074,7 +1072,7 @@ const EMAILJS_TEMPLATE_ID =
 
 
 /* =====================================================
-   CLIENT VARIABLES
+   VARIABLES
 ===================================================== */
 
 let supabaseClient = null;
@@ -1095,18 +1093,68 @@ const BRANDING_STORAGE_KEY =
 
 
 /* =====================================================
-   INITIALIZE SERVICES
+   HELPERS
+===================================================== */
+
+function $(id){
+  return document.getElementById(id);
+}
+
+
+function showMessage(elementId,text,type){
+
+  const element = $(elementId);
+
+  if(!element){
+    return;
+  }
+
+  element.textContent = text;
+
+  element.className =
+    "message " + type;
+}
+
+
+function escapeHTML(value){
+
+  if(value === null || value === undefined){
+    return "";
+  }
+
+  return String(value)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+
+/* =====================================================
+   INITIALIZE
 ===================================================== */
 
 function initializeServices(){
 
-  /* SUPABASE */
+  try{
 
-  if(
-    typeof window.supabase !== "undefined"
-  ){
+    if(
+      typeof window.supabase === "undefined"
+    ){
 
-    try{
+      console.error(
+        "Supabase library not loaded."
+      );
+
+      showMessage(
+        "verifyMessage",
+        "Supabase library could not be loaded. Check your internet connection and reload.",
+        "error"
+      );
+
+    }
+    else{
 
       supabaseClient =
         window.supabase.createClient(
@@ -1114,33 +1162,28 @@ function initializeServices(){
           SUPABASE_KEY
         );
 
-    }
-    catch(error){
-
-      console.error(
-        "Supabase initialization error:",
-        error
+      console.log(
+        "Supabase initialized successfully."
       );
 
     }
 
   }
-  else{
+  catch(error){
 
     console.error(
-      "Supabase library was not loaded."
+      "Supabase initialization error:",
+      error
     );
 
   }
 
 
-  /* EMAILJS */
+  try{
 
-  if(
-    typeof window.emailjs !== "undefined"
-  ){
-
-    try{
+    if(
+      typeof window.emailjs !== "undefined"
+    ){
 
       window.emailjs.init({
         publicKey:
@@ -1149,27 +1192,29 @@ function initializeServices(){
 
       emailReady = true;
 
+      console.log(
+        "EmailJS initialized successfully."
+      );
+
     }
-    catch(error){
+    else{
 
       console.error(
-        "EmailJS initialization error:",
-        error
+        "EmailJS library not loaded."
       );
 
     }
 
   }
-  else{
+  catch(error){
 
     console.error(
-      "EmailJS library was not loaded."
+      "EmailJS initialization error:",
+      error
     );
 
   }
 
-
-  /* AUTH LISTENER */
 
   if(supabaseClient){
 
@@ -1198,7 +1243,7 @@ function initializeServices(){
 
 
 /* =====================================================
-   CHECK SERVICES
+   SUPABASE CHECK
 ===================================================== */
 
 function checkSupabase(){
@@ -1207,7 +1252,7 @@ function checkSupabase(){
 
     showMessage(
       "verifyMessage",
-      "Supabase could not be loaded. Please refresh the page and try again.",
+      "Supabase is not ready. Please reload the page.",
       "error"
     );
 
@@ -1221,34 +1266,7 @@ function checkSupabase(){
 
 
 /* =====================================================
-   MESSAGE
-===================================================== */
-
-function showMessage(
-  elementId,
-  text,
-  type
-){
-
-  const element =
-    document.getElementById(
-      elementId
-    );
-
-  if(!element){
-    return;
-  }
-
-  element.textContent = text;
-
-  element.className =
-    "message " + type;
-
-}
-
-
-/* =====================================================
-   BRANDING GET
+   BRANDING
 ===================================================== */
 
 function getBranding(){
@@ -1297,92 +1315,56 @@ function getBranding(){
 }
 
 
-/* =====================================================
-   APPLY BRANDING
-===================================================== */
-
 function applyBranding(){
 
   const branding =
     getBranding();
 
-  const header =
-    document.getElementById(
-      "headerBrandName"
-    );
-
-  const footer =
-    document.getElementById(
-      "footerBrandName"
-    );
-
-  const nameInput =
-    document.getElementById(
-      "brandingName"
-    );
-
-  const logoInput =
-    document.getElementById(
-      "brandingLogo"
-    );
-
-  const previewName =
-    document.getElementById(
-      "brandingPreviewName"
-    );
-
-  const previewImage =
-    document.getElementById(
-      "brandingPreviewImage"
-    );
-
-
-  if(header){
-    header.textContent =
+  if($("headerBrandName")){
+    $("headerBrandName").textContent =
       branding.name;
   }
 
-  if(footer){
-    footer.textContent =
+  if($("footerBrandName")){
+    $("footerBrandName").textContent =
       branding.name;
   }
 
-  if(nameInput){
-    nameInput.value =
+  if($("brandingName")){
+    $("brandingName").value =
       branding.name;
   }
 
-  if(logoInput){
-    logoInput.value =
+  if($("brandingLogo")){
+    $("brandingLogo").value =
       branding.logo;
   }
 
-  if(previewName){
-    previewName.textContent =
+  if($("brandingPreviewName")){
+    $("brandingPreviewName").textContent =
       branding.name;
   }
 
-  if(previewImage){
+  if($("brandingPreviewImage")){
 
     if(branding.logo){
 
-      previewImage.src =
+      $("brandingPreviewImage").src =
         branding.logo;
 
-      previewImage.classList.remove(
-        "hidden"
-      );
+      $("brandingPreviewImage")
+        .classList
+        .remove("hidden");
 
     }
     else{
 
-      previewImage.removeAttribute(
-        "src"
-      );
+      $("brandingPreviewImage")
+        .removeAttribute("src");
 
-      previewImage.classList.add(
-        "hidden"
-      );
+      $("brandingPreviewImage")
+        .classList
+        .add("hidden");
 
     }
 
@@ -1391,31 +1373,17 @@ function applyBranding(){
 }
 
 
-/* =====================================================
-   SAVE BRANDING
-===================================================== */
-
 function saveBranding(){
 
-  const nameElement =
-    document.getElementById(
-      "brandingName"
-    );
-
-  const logoElement =
-    document.getElementById(
-      "brandingLogo"
-    );
-
-  if(!nameElement || !logoElement){
-    return;
-  }
-
   const name =
-    nameElement.value.trim();
+    $("brandingName")
+      .value
+      .trim();
 
   const logo =
-    logoElement.value.trim();
+    $("brandingLogo")
+      .value
+      .trim();
 
   try{
 
@@ -1456,10 +1424,6 @@ function saveBranding(){
 }
 
 
-/* =====================================================
-   RESET BRANDING
-===================================================== */
-
 function resetBranding(){
 
   try{
@@ -1487,7 +1451,7 @@ function resetBranding(){
 
 
 /* =====================================================
-   VERIFY CERTIFICATE
+   VERIFY
 ===================================================== */
 
 async function verifyCertificate(
@@ -1499,13 +1463,17 @@ async function verifyCertificate(
   }
 
   const input =
-    document.getElementById(
-      "certificateId"
-    );
+    $("certificateId");
 
   const certificateId =
     certificateIdFromURL ||
-    (input ? input.value.trim() : "");
+    (
+      input
+      ?
+      input.value.trim()
+      :
+      ""
+    );
 
 
   if(!certificateId){
@@ -1529,22 +1497,20 @@ async function verifyCertificate(
 
 
   const section =
-    document.getElementById(
-      "verificationSection"
-    );
+    $("verificationSection");
 
   const result =
-    document.getElementById(
-      "certificateResult"
-    );
+    $("certificateResult");
 
 
-  section.classList.remove(
-    "hidden"
-  );
+  if(section){
+    section.classList.remove("hidden");
+  }
 
-  result.innerHTML =
-    "<p>Checking certificate...</p>";
+  if(result){
+    result.innerHTML =
+      "<p>Checking certificate...</p>";
+  }
 
 
   try{
@@ -1559,6 +1525,12 @@ async function verifyCertificate(
           }
         }
       );
+
+
+    console.log(
+      "Function response:",
+      response
+    );
 
 
     if(response.error){
@@ -1609,6 +1581,7 @@ async function verifyCertificate(
       error
     );
 
+
     result.innerHTML = `
       <div class="message error">
         Unable to verify certificate.
@@ -1616,9 +1589,11 @@ async function verifyCertificate(
       </div>
     `;
 
+
     showMessage(
       "verifyMessage",
-      "Verification failed.",
+      "Verification failed: " +
+      (error.message || "Unknown error"),
       "error"
     );
 
@@ -1637,9 +1612,7 @@ function displayCertificate(
 ){
 
   const result =
-    document.getElementById(
-      "certificateResult"
-    );
+    $("certificateResult");
 
   const branding =
     getBranding();
@@ -1654,6 +1627,7 @@ function displayCertificate(
 
 
   let logoHTML = "";
+
 
   if(branding.logo){
 
@@ -1760,7 +1734,7 @@ function displayCertificate(
 
       <button
         type="button"
-        onclick="printCertificate()"
+        id="printButton"
       >
         🖨 Print / Save
       </button>
@@ -1770,12 +1744,8 @@ function displayCertificate(
   `;
 
 
-  /* QR */
-
   const qrElement =
-    document.getElementById(
-      "qrcode"
-    );
+    $("qrcode");
 
 
   if(
@@ -1791,13 +1761,36 @@ function displayCertificate(
         cert.certificate_id
       );
 
-    new window.QRCode(
-      qrElement,
-      {
-        text:verifyURL,
-        width:150,
-        height:150
-      }
+
+    try{
+
+      new window.QRCode(
+        qrElement,
+        {
+          text:verifyURL,
+          width:150,
+          height:150
+        }
+      );
+
+    }
+    catch(error){
+
+      console.error(
+        "QR error:",
+        error
+      );
+
+    }
+
+  }
+
+
+  if($("printButton")){
+
+    $("printButton").addEventListener(
+      "click",
+      printCertificate
     );
 
   }
@@ -1812,9 +1805,8 @@ function displayCertificate(
 function printCertificate(){
 
   const certificate =
-    document.getElementById(
-      "printCertificate"
-    );
+    $("printCertificate");
+
 
   if(!certificate){
 
@@ -1959,6 +1951,7 @@ function printCertificate(){
 
   printWindow.focus();
 
+
   setTimeout(
     function(){
 
@@ -1978,24 +1971,17 @@ function printCertificate(){
 async function adminLogin(){
 
   if(!checkSupabase()){
-    showMessage(
-      "loginMessage",
-      "Supabase is not loaded. Refresh the page and try again.",
-      "error"
-    );
     return;
   }
 
 
   const email =
-    document
-      .getElementById("adminEmail")
+    $("adminEmail")
       .value
       .trim();
 
   const password =
-    document
-      .getElementById("adminPassword")
+    $("adminPassword")
       .value;
 
 
@@ -2022,12 +2008,14 @@ async function adminLogin(){
   try{
 
     const result =
-      await supabaseClient.auth.signInWithPassword({
+      await supabaseClient.auth
+        .signInWithPassword({
 
-        email:email,
-        password:password
+          email:email,
 
-      });
+          password:password
+
+        });
 
 
     if(result.error){
@@ -2047,11 +2035,7 @@ async function adminLogin(){
 
       showAdminDashboard();
 
-      document
-        .getElementById(
-          "adminPassword"
-        )
-        .value = "";
+      $("adminPassword").value = "";
 
       await loadDashboard();
 
@@ -2064,7 +2048,8 @@ async function adminLogin(){
 
     showMessage(
       "loginMessage",
-      "Login failed. Please try again.",
+      "Login failed: " +
+      (error.message || "Unknown error"),
       "error"
     );
 
@@ -2074,47 +2059,31 @@ async function adminLogin(){
 
 
 /* =====================================================
-   SHOW / HIDE DASHBOARD
+   DASHBOARD SHOW/HIDE
 ===================================================== */
 
 function showAdminDashboard(){
 
-  document
-    .getElementById(
-      "loginSection"
-    )
-    .classList.add(
-      "hidden"
-    );
+  $("loginSection")
+    .classList
+    .add("hidden");
 
-  document
-    .getElementById(
-      "dashboardSection"
-    )
-    .classList.remove(
-      "hidden"
-    );
+  $("dashboardSection")
+    .classList
+    .remove("hidden");
 
 }
 
 
 function hideAdminDashboard(){
 
-  document
-    .getElementById(
-      "dashboardSection"
-    )
-    .classList.add(
-      "hidden"
-    );
+  $("dashboardSection")
+    .classList
+    .add("hidden");
 
-  document
-    .getElementById(
-      "loginSection"
-    )
-    .classList.remove(
-      "hidden"
-    );
+  $("loginSection")
+    .classList
+    .remove("hidden");
 
 }
 
@@ -2161,10 +2130,13 @@ async function checkSession(){
     return;
   }
 
+
   try{
 
     const result =
-      await supabaseClient.auth.getSession();
+      await supabaseClient.auth
+        .getSession();
+
 
     if(
       result.data &&
@@ -2202,14 +2174,10 @@ async function loadDashboard(){
 
 
   const searchInput =
-    document.getElementById(
-      "dashboardSearch"
-    );
+    $("dashboardSearch");
 
   const statusInput =
-    document.getElementById(
-      "dashboardStatus"
-    );
+    $("dashboardStatus");
 
 
   if(!searchInput || !statusInput){
@@ -2302,9 +2270,7 @@ function renderDashboard(
 ){
 
   const table =
-    document.getElementById(
-      "dashboardTable"
-    );
+    $("dashboardTable");
 
 
   if(!table){
@@ -2342,9 +2308,7 @@ function renderDashboard(
       function(cert){
 
         const row =
-          document.createElement(
-            "tr"
-          );
+          document.createElement("tr");
 
 
         const statusClass =
@@ -2391,7 +2355,8 @@ function renderDashboard(
 
             <button
               type="button"
-              onclick="viewDashboardCertificate('${id}')"
+              class="viewCertButton"
+              data-id="${id}"
             >
               View
             </button>
@@ -2402,8 +2367,8 @@ function renderDashboard(
               `
               <button
                 type="button"
-                class="btn-danger"
-                onclick="revokeCertificate('${id}')"
+                class="btn-danger revokeCertButton"
+                data-id="${id}"
               >
                 Revoke
               </button>
@@ -2421,6 +2386,46 @@ function renderDashboard(
 
       }
     );
+
+
+    document
+      .querySelectorAll(".viewCertButton")
+      .forEach(
+        function(button){
+
+          button.addEventListener(
+            "click",
+            function(){
+
+              viewDashboardCertificate(
+                this.dataset.id
+              );
+
+            }
+          );
+
+        }
+      );
+
+
+    document
+      .querySelectorAll(".revokeCertButton")
+      .forEach(
+        function(button){
+
+          button.addEventListener(
+            "click",
+            function(){
+
+              revokeCertificate(
+                this.dataset.id
+              );
+
+            }
+          );
+
+        }
+      );
 
   }
 
@@ -2481,26 +2486,20 @@ async function loadStats(){
       ).length;
 
 
-    document
-      .getElementById(
-        "totalCertificates"
-      )
-      .textContent =
+    if($("totalCertificates")){
+      $("totalCertificates").textContent =
         total;
+    }
 
-    document
-      .getElementById(
-        "validCertificates"
-      )
-      .textContent =
+    if($("validCertificates")){
+      $("validCertificates").textContent =
         valid;
+    }
 
-    document
-      .getElementById(
-        "revokedCertificates"
-      )
-      .textContent =
+    if($("revokedCertificates")){
+      $("revokedCertificates").textContent =
         revoked;
+    }
 
   }
   catch(error){
@@ -2526,12 +2525,8 @@ async function viewDashboardCertificate(
     );
 
 
-  document
-    .getElementById(
-      "certificateId"
-    )
-    .value =
-      id;
+  $("certificateId").value =
+    id;
 
 
   await verifyCertificate(id);
@@ -2546,7 +2541,7 @@ async function viewDashboardCertificate(
 
 
 /* =====================================================
-   ISSUE CERTIFICATE
+   ISSUE
 ===================================================== */
 
 async function issueCertificate(){
@@ -2557,41 +2552,26 @@ async function issueCertificate(){
 
 
   const certificateId =
-    document
-      .getElementById(
-        "newCertificateId"
-      )
+    $("newCertificateId")
       .value
       .trim();
 
   const studentName =
-    document
-      .getElementById(
-        "newStudentName"
-      )
+    $("newStudentName")
       .value
       .trim();
 
   const courseName =
-    document
-      .getElementById(
-        "newCourseName"
-      )
+    $("newCourseName")
       .value
       .trim();
 
   const issueDate =
-    document
-      .getElementById(
-        "newIssueDate"
-      )
+    $("newIssueDate")
       .value;
 
   const issuedBy =
-    document
-      .getElementById(
-        "newIssuedBy"
-      )
+    $("newIssuedBy")
       .value
       .trim() ||
     "CertiChain";
@@ -2675,29 +2655,10 @@ async function issueCertificate(){
     );
 
 
-    document
-      .getElementById(
-        "newCertificateId"
-      )
-      .value = "";
-
-    document
-      .getElementById(
-        "newStudentName"
-      )
-      .value = "";
-
-    document
-      .getElementById(
-        "newCourseName"
-      )
-      .value = "";
-
-    document
-      .getElementById(
-        "newIssueDate"
-      )
-      .value = "";
+    $("newCertificateId").value = "";
+    $("newStudentName").value = "";
+    $("newCourseName").value = "";
+    $("newIssueDate").value = "";
 
 
     await loadDashboard();
@@ -2806,14 +2767,10 @@ async function revokeCertificate(
 function openContact(plan){
 
   const section =
-    document.getElementById(
-      "contactSection"
-    );
+    $("contactSection");
 
   const title =
-    document.getElementById(
-      "contactTitle"
-    );
+    $("contactTitle");
 
 
   section.classList.remove(
@@ -2834,52 +2791,32 @@ function openContact(plan){
 
 function closeContact(){
 
-  document
-    .getElementById(
-      "contactSection"
-    )
-    .classList.add(
-      "hidden"
-    );
+  $("contactSection")
+    .classList
+    .add("hidden");
 
 }
 
 
-/* =====================================================
-   SEND EMAIL
-===================================================== */
-
 async function sendContactEmail(){
 
   const name =
-    document
-      .getElementById(
-        "contactName"
-      )
+    $("contactName")
       .value
       .trim();
 
   const email =
-    document
-      .getElementById(
-        "contactEmail"
-      )
+    $("contactEmail")
       .value
       .trim();
 
   const title =
-    document
-      .getElementById(
-        "contactTitle"
-      )
+    $("contactTitle")
       .value
       .trim();
 
   const message =
-    document
-      .getElementById(
-        "contactMessage"
-      )
+    $("contactMessage")
       .value
       .trim();
 
@@ -2950,34 +2887,15 @@ async function sendContactEmail(){
 
     showMessage(
       "contactMessageBox",
-      "Message sent successfully! We will contact you soon.",
+      "Message sent successfully!",
       "success"
     );
 
 
-    document
-      .getElementById(
-        "contactName"
-      )
-      .value = "";
-
-    document
-      .getElementById(
-        "contactEmail"
-      )
-      .value = "";
-
-    document
-      .getElementById(
-        "contactTitle"
-      )
-      .value = "";
-
-    document
-      .getElementById(
-        "contactMessage"
-      )
-      .value = "";
+    $("contactName").value = "";
+    $("contactEmail").value = "";
+    $("contactTitle").value = "";
+    $("contactMessage").value = "";
 
   }
   catch(error){
@@ -2999,32 +2917,136 @@ async function sendContactEmail(){
 
 
 /* =====================================================
-   ESCAPE HTML
+   EVENTS
 ===================================================== */
 
-function escapeHTML(value){
+function setupEvents(){
 
-  if(
-    value === null ||
-    value === undefined
-  ){
+  /* VERIFY */
 
-    return "";
+  $("verifyButton")
+    .addEventListener(
+      "click",
+      function(){
 
-  }
+        verifyCertificate();
+
+      }
+    );
 
 
-  return String(value)
+  /* LOGIN */
 
-    .replace(/&/g,"&amp;")
+  $("loginButton")
+    .addEventListener(
+      "click",
+      adminLogin
+    );
 
-    .replace(/</g,"&lt;")
 
-    .replace(/>/g,"&gt;")
+  /* LOGOUT */
 
-    .replace(/"/g,"&quot;")
+  $("logoutButton")
+    .addEventListener(
+      "click",
+      adminLogout
+    );
 
-    .replace(/'/g,"&#039;");
+
+  /* BRANDING */
+
+  $("saveBrandingButton")
+    .addEventListener(
+      "click",
+      saveBranding
+    );
+
+
+  $("resetBrandingButton")
+    .addEventListener(
+      "click",
+      resetBranding
+    );
+
+
+  /* ISSUE */
+
+  $("issueButton")
+    .addEventListener(
+      "click",
+      issueCertificate
+    );
+
+
+  /* SEARCH */
+
+  $("dashboardSearch")
+    .addEventListener(
+      "input",
+      loadDashboard
+    );
+
+
+  $("dashboardStatus")
+    .addEventListener(
+      "change",
+      loadDashboard
+    );
+
+
+  /* CONTACT */
+
+  document
+    .querySelectorAll(".contactPlanButton")
+    .forEach(
+      function(button){
+
+        button.addEventListener(
+          "click",
+          function(){
+
+            openContact(
+              this.dataset.plan
+            );
+
+          }
+        );
+
+      }
+    );
+
+
+  $("sendContactButton")
+    .addEventListener(
+      "click",
+      sendContactEmail
+    );
+
+
+  $("closeContactButton")
+    .addEventListener(
+      "click",
+      closeContact
+    );
+
+
+  /* ENTER KEY FOR VERIFY */
+
+  $("certificateId")
+    .addEventListener(
+      "keydown",
+      function(event){
+
+        if(event.key === "Enter"){
+
+          event.preventDefault();
+
+          verifyCertificate();
+
+        }
+
+      }
+    );
 
 }
 
@@ -3037,30 +3059,28 @@ window.addEventListener(
   "DOMContentLoaded",
   async function(){
 
-    /* Branding */
+    console.log(
+      "CertiChain JavaScript started."
+    );
+
 
     applyBranding();
 
 
-    /*
-      Because the external libraries use defer,
-      they should now be available.
-    */
-
     initializeServices();
 
 
-    /* Session */
+    setupEvents();
+
 
     await checkSession();
 
-
-    /* URL certificate */
 
     const params =
       new URLSearchParams(
         window.location.search
       );
+
 
     const id =
       params.get("id");
@@ -3068,14 +3088,8 @@ window.addEventListener(
 
     if(id){
 
-      const input =
-        document.getElementById(
-          "certificateId"
-        );
-
-      if(input){
-        input.value = id;
-      }
+      $("certificateId").value =
+        id;
 
       await verifyCertificate(id);
 
@@ -3086,7 +3100,7 @@ window.addEventListener(
 
 
 /* =====================================================
-   GLOBAL ERROR HANDLER
+   GLOBAL ERROR
 ===================================================== */
 
 window.addEventListener(
@@ -3094,7 +3108,7 @@ window.addEventListener(
   function(event){
 
     console.error(
-      "Global JavaScript error:",
+      "JavaScript error:",
       event.error || event.message
     );
 
@@ -3103,6 +3117,7 @@ window.addEventListener(
 
 </script>
 
+
 </body>
 
-  </html>
+      </html>
